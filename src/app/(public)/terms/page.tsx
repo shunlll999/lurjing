@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BrandMark } from "@/components/brand-logo";
 
 export default function TermsPage() {
@@ -16,6 +17,7 @@ export default function TermsPage() {
       </header>
 
       <main className="legal-content">
+        <Image src="/assets/images/lurjinw.png" alt="LurJing" className="logo-lurjing" width={100} height={100} />
         <div className="legal-head">
           <p className="eyebrow">TERMS & CONDITIONS</p>
           <h1>ข้อตกลงและเงื่อนไขการใช้งาน</h1>

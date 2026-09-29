@@ -21,6 +21,8 @@ body {
   color:var(--text);
   background:linear-gradient(180deg,#06101d 0%,#0a1625 100%);
   font-family:"Sukhumvit Set","Avenir Next","Leelawadee UI","Noto Sans Thai",Tahoma,ui-sans-serif,system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 a { color:inherit; text-decoration:none; }
 button, input { font:inherit; }
@@ -1446,7 +1448,7 @@ video {
 .hero-copy h1 {
   margin:20px 0 18px;
   font-size:clamp(44px,5.7vw,78px);
-  line-height:1.02;
+  line-height:1.3;
   letter-spacing:-.05em;
 }
 .hero-copy h1 em {
@@ -3244,7 +3246,8 @@ select {
 
 .brand strong {
   color: #164F3E;
-  font-size: 15px;
+  font-size: 24px;
+  line-height: 16px;
 }
 
 .brand span {
@@ -3722,6 +3725,12 @@ tbody tr:hover {
   background: rgba(252,253,249,.78);
   backdrop-filter: blur(12px);
 } */
+
+.logo-lurjing {
+  width: 300px;
+  height: auto;
+  object-fit: contain;
+}
 
 .landing-brand,
 .auth-brand {
