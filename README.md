@@ -1,8 +1,12 @@
 # เหลือจริง / LurJing
 
-Seller Profit สำหรับร้านค้าออนไลน์ไทย
+Seller Profit Copilot สำหรับร้านค้าออนไลน์ไทย
 
 **Primary domain:** `lurjing.com`
+
+<img width="538" height="376" alt="Screenshot 2569-09-29 at 18 54 49" src="https://github.com/user-attachments/assets/0c4e5117-d946-42bb-b55c-6c4145a9ecdd" />
+<img width="1115" height="554" alt="Screenshot 2569-09-29 at 18 56 16" src="https://github.com/user-attachments/assets/d4724ca7-7b83-440e-9c96-945a920082d4" />
+
 
 ## Stack
 
