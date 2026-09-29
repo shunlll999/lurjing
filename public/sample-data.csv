@@ -1,0 +1,5 @@
+date,channel,sku,product,qty,revenue,cogs,commission,payment_fee,service_fee,affiliate,ads,discount,refunds
+2026-09-01,TikTok Shop,SERUM-30,Glow Serum 30ml,28,8372,3780,530,220,255,900,1512,560,0
+2026-09-02,Shopee,MASK-10,Hydra Mask 10pcs,18,6282,2520,390,120,110,0,540,360,0
+2026-09-03,TikTok Shop,TONER-100,Calm Toner 100ml,24,7176,2880,455,190,216,780,1296,480,299
+2026-09-04,Lazada,SERUM-30,Glow Serum 30ml,16,4784,2160,300,120,154,0,448,320,0
