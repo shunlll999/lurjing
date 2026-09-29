@@ -15,7 +15,7 @@ export function AuthLayout({
       <div className="auth-backdrop" />
       <div className="auth-shell">
         <Link href="/" className="auth-brand">
-          <BrandMark size={38} />
+          <BrandMark size={100} />
           <div>
             <strong>เหลือจริง</strong>
             <small>Seller Profit Copilot</small>

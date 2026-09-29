@@ -22,7 +22,7 @@ export default function LandingPage() {
     <div className="landing-page">
       <header className="landing-nav">
         <Link href="/" className="landing-brand">
-          <BrandMark size={38} />
+          <BrandMark size={100} />
           <div>
             <strong>เหลือจริง</strong>
             <small>Seller Profit Copilot</small>
