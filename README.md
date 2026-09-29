@@ -1,6 +1,6 @@
 # เหลือจริง / LurJing
 
-Seller Profit Copilot สำหรับร้านค้าออนไลน์ไทย
+Seller Profit สำหรับร้านค้าออนไลน์ไทย
 
 **Primary domain:** `lurjing.com`
 

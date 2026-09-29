@@ -25,7 +25,7 @@ export default function LandingPage() {
           <BrandMark size={100} />
           <div>
             <strong>เหลือจริง</strong>
-            <small>Seller Profit Copilot</small>
+            <small>Seller Profit</small>
           </div>
         </Link>
 

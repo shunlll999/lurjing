@@ -34,7 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <BrandMark size={42} />
           <div>
             <strong>เหลือจริง</strong>
-            <span>Seller Profit Copilot</span>
+            <span>Seller Profit</span>
           </div>
         </Link>
 
@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="content">
         <header className="topbar">
           <div>
-            <p className="eyebrow">SELLER PROFIT COPILOT</p>
+            <p className="eyebrow">Seller Profit</p>
             <h1>ขายเยอะแล้ว เหลือกำไรจริงเท่าไร?</h1>
           </div>
 

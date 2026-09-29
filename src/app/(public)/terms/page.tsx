@@ -10,7 +10,7 @@ export default function TermsPage() {
           <BrandMark size={32} />
           <div>
             <strong>เหลือจริง</strong>
-            <small>Seller Profit Copilot</small>
+            <small>Seller Profit</small>
           </div>
         </Link>
         <Link href="/register" className="button primary">เริ่มใช้ฟรี</Link>
