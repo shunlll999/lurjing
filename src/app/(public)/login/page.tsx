@@ -243,13 +243,13 @@ function LoginContent() {
         <b>→</b>
       </button>
 
-      <div className="demo-credentials">
+      {/* <div className="demo-credentials">
         <span>Demo:</span>
         <code>{DEMO_EMAIL}</code>
         <code>{DEMO_PASSWORD}</code>
-      </div>
+      </div> */}
 
-      <button
+      {/* <button
         type="button"
         className="admin-login-shortcut"
         onClick={openAdmin}
@@ -262,7 +262,7 @@ function LoginContent() {
           </span>
         </div>
         <b>→</b>
-      </button>
+      </button> */}
 
       <p className="auth-switch">
         ยังไม่มีบัญชี? <Link href="/register">สมัครฟรี</Link>
