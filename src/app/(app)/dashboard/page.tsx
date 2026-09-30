@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSellerData } from "@/components/seller-data-provider";
+import { DataEmptyState } from "@/components/data-empty-state";
 import { MetricCard } from "@/components/metric-card";
 import { ProductTable } from "@/components/product-table";
 import { DailyTrendChart } from "@/components/daily-trend-chart";
@@ -9,7 +10,20 @@ import { PlatformCostChart } from "@/components/platform-cost-chart";
 import { aggregateBy, money, percent, totals } from "@/lib/analytics";
 
 export default function DashboardPage() {
-  const { rows } = useSellerData();
+  const { rows, ready } = useSellerData();
+  if (!ready) {
+    return (
+      <section className="card data-loading-state">
+        <div className="auth-loading-dot" />
+        <span>กำลังเตรียมข้อมูลร้าน...</span>
+      </section>
+    );
+  }
+
+  if (rows.length === 0) {
+    return <DataEmptyState />;
+  }
+
   const summary = totals(rows);
   const channels = aggregateBy(rows, "channel").sort((a, b) => b.profit - a.profit);
   const products = aggregateBy(rows, "sku").sort((a, b) => b.profit - a.profit);

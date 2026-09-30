@@ -1,26 +1,60 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+export function ProtectedRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, ready } = useAuth();
 
   useEffect(() => {
-    if (ready && !user) {
-      router.replace("/login?next=/dashboard");
-    }
-  }, [ready, user, router]);
+    if (!ready) return;
 
-  if (!ready || !user) {
+    if (
+      !user ||
+      user.status !== "active"
+    ) {
+      const next =
+        pathname || "/dashboard";
+
+      router.replace(
+        `/login?next=${encodeURIComponent(
+          next,
+        )}`,
+      );
+    }
+  }, [
+    ready,
+    user,
+    pathname,
+    router,
+  ]);
+
+  if (!ready) {
     return (
       <div className="auth-loading">
         <div className="auth-loading-dot" />
-        <span>กำลังโหลดบัญชี...</span>
+        <span>
+          กำลังตรวจสอบ Firebase session...
+        </span>
       </div>
     );
+  }
+
+  if (
+    !user ||
+    user.status !== "active"
+  ) {
+    return null;
   }
 
   return <>{children}</>;

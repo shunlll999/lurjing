@@ -3,17 +3,19 @@ import Image from "next/image";
 export function BrandMark({
   size = 40,
   className = "",
+  logoPath = "/assets/images/LJ.png",
 }: {
   size?: number;
   className?: string;
+  logoPath?: string;
 }) {
   return (
     <Image
-      src="/assets/images/LJ.png"
-      alt="LurJing"
+      className={className}
       width={size}
       height={size}
-      className={className}
+      src={logoPath}
+      alt="LurJing"
     />
     // <svg
     //   className={className}

@@ -1,6 +1,6 @@
 # เหลือจริง / LurJing
 
-Seller Profit Copilot สำหรับร้านค้าออนไลน์ไทย
+Seller Profit สำหรับร้านค้าออนไลน์ไทย
 
 **Primary domain:** `lurjing.com`
 
@@ -114,7 +114,7 @@ Protected:
 ### Demo account
 
 - Email: `demo@lurjing.com`
-- Password: `demo1234`
+- Password: `demo123`
 
 > Demo/Auth ในเวอร์ชัน POC ใช้ browser localStorage และ Web Crypto SHA-256 สำหรับบัญชีที่ผู้ใช้สมัครเอง ไม่ใช่ production authentication.
 

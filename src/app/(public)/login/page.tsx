@@ -7,13 +7,14 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 
 import { AuthLayout } from "@/app/(public)/auth-layout";
 import { useAuth } from "@/components/auth-provider";
 import {
-  ADMIN_EMAIL,
-  ADMIN_PASSWORD,
   DEMO_EMAIL,
   DEMO_PASSWORD,
 } from "@/lib/auth";
@@ -33,9 +34,12 @@ const SAFE_NEXT_ROUTES = [
   "/admin/settings",
 ] as const;
 
-type SafeNextRoute = (typeof SAFE_NEXT_ROUTES)[number];
+type SafeNextRoute =
+  (typeof SAFE_NEXT_ROUTES)[number];
 
-function getSafeNextRoute(value: string | null): SafeNextRoute {
+function getSafeNextRoute(
+  value: string | null,
+): SafeNextRoute {
   switch (value) {
     case "/dashboard":
     case "/costs":
@@ -58,24 +62,38 @@ function getSafeNextRoute(value: string | null): SafeNextRoute {
 
 function LoginContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { login, loginDemo, user, ready } = useAuth();
+  const searchParams =
+    useSearchParams();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const {
+    login,
+    loginDemo,
+    user,
+    ready,
+  } = useAuth();
 
-  const next = getSafeNextRoute(searchParams.get("next"));
+  const [email, setEmail] =
+    useState("");
 
-  /**
-   * Important:
-   * With Next.js typedRoutes enabled, do not pass a dynamic string
-   * directly to router.push().
-   *
-   * Every branch below uses a literal route, so Next can validate it.
-   */
-  const pushSafeRoute = (route: SafeNextRoute) => {
+  const [password, setPassword] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
+
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
+
+  const next =
+    getSafeNextRoute(
+      searchParams.get("next"),
+    );
+
+  const pushSafeRoute = (
+    route: SafeNextRoute,
+  ) => {
     switch (route) {
       case "/dashboard":
         router.push("/dashboard");
@@ -108,14 +126,17 @@ function LoginContent() {
         router.push("/admin/users");
         break;
       case "/admin/feedback":
-        router.push("/admin/feedback");
+        router.push(
+          "/admin/feedback",
+        );
         break;
       case "/admin/settings":
-        router.push("/admin/settings");
+        router.push(
+          "/admin/settings",
+        );
         break;
       default:
         router.push("/dashboard");
-        break;
     }
   };
 
@@ -127,36 +148,50 @@ function LoginContent() {
       return;
     }
 
-    router.replace("/dashboard");
+    pushSafeRoute(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, user, router]);
 
   useEffect(() => {
-    if (searchParams.get("demo") === "1") {
+    if (
+      searchParams.get("demo") ===
+      "1"
+    ) {
       setEmail(DEMO_EMAIL);
       setPassword(DEMO_PASSWORD);
     }
   }, [searchParams]);
 
-  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (
+    event: FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     setError("");
     setSubmitting(true);
 
-    const result = await login(email, password);
+    const result = await login(
+      email,
+      password,
+    );
 
     if (!result.ok) {
-      setError(result.message ?? "เข้าสู่ระบบไม่สำเร็จ");
+      setError(
+        result.message ??
+          "เข้าสู่ระบบไม่สำเร็จ",
+      );
       setSubmitting(false);
       return;
     }
 
-    if (result.destination === "/admin") {
+    if (
+      result.destination ===
+      "/admin"
+    ) {
       router.push("/admin");
       return;
     }
 
-    // Normal user: honor the validated ?next= route.
     pushSafeRoute(next);
   };
 
@@ -164,32 +199,30 @@ function LoginContent() {
     setError("");
     setSubmitting(true);
 
-    await loginDemo();
-
-    router.push("/dashboard");
-  };
-
-  const openAdmin = async () => {
-    setError("");
-    setSubmitting(true);
-
-    const result = await login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    const result =
+      await loginDemo();
 
     if (!result.ok) {
-      setError(result.message ?? "เข้าสู่ระบบ Admin ไม่สำเร็จ");
+      setError(
+        result.message ??
+          "Demo account ยังไม่ได้สร้างใน Firebase Authentication",
+      );
       setSubmitting(false);
       return;
     }
 
-    router.push("/admin");
+    router.push("/dashboard");
   };
 
   return (
     <AuthLayout
       title="กลับมาดูว่าเหลือจริงเท่าไร"
-      subtitle="เข้าสู่ระบบเพื่อดู Dashboard และข้อมูลร้านของคุณ"
+      subtitle="เข้าสู่ระบบด้วย Firebase Authentication"
     >
-      <form className="auth-form" onSubmit={onSubmit}>
+      <form
+        className="auth-form"
+        onSubmit={onSubmit}
+      >
         <label>
           <span>อีเมล</span>
           <input
@@ -198,7 +231,11 @@ function LoginContent() {
             autoComplete="email"
             placeholder="you@example.com"
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) =>
+              setEmail(
+                event.target.value,
+              )
+            }
           />
         </label>
 
@@ -211,18 +248,28 @@ function LoginContent() {
             autoComplete="current-password"
             placeholder="อย่างน้อย 6 ตัวอักษร"
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) =>
+              setPassword(
+                event.target.value,
+              )
+            }
           />
         </label>
 
-        {error && <div className="auth-error">{error}</div>}
+        {error && (
+          <div className="auth-error">
+            {error}
+          </div>
+        )}
 
         <button
           type="submit"
           className="button primary auth-submit"
           disabled={submitting}
         >
-          {submitting ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+          {submitting
+            ? "กำลังเข้าสู่ระบบ..."
+            : "เข้าสู่ระบบ"}
         </button>
       </form>
 
@@ -237,35 +284,20 @@ function LoginContent() {
         disabled={submitting}
       >
         <div>
-          <strong>เข้า Demo Account</strong>
-          <span>ดู Dashboard ที่มีข้อมูลตัวอย่างพร้อมใช้งาน</span>
-        </div>
-        <b>→</b>
-      </button>
-
-      {/* <div className="demo-credentials">
-        <span>Demo:</span>
-        <code>{DEMO_EMAIL}</code>
-        <code>{DEMO_PASSWORD}</code>
-      </div> */}
-
-      {/* <button
-        type="button"
-        className="admin-login-shortcut"
-        onClick={openAdmin}
-        disabled={submitting}
-      >
-        <div>
-          <strong>เข้าสู่ Admin POC</strong>
+          <strong>
+            เข้า Demo Account
+          </strong>
           <span>
-            {ADMIN_EMAIL} / {ADMIN_PASSWORD}
+            Demo เท่านั้นที่ใช้ข้อมูลตัวอย่างของระบบ
           </span>
         </div>
         <b>→</b>
-      </button> */}
-
+      </button>
       <p className="auth-switch">
-        ยังไม่มีบัญชี? <Link href="/register">สมัครฟรี</Link>
+        ยังไม่มีบัญชี?{" "}
+        <Link href="/register">
+          สมัครฟรี
+        </Link>
       </p>
     </AuthLayout>
   );
@@ -275,14 +307,18 @@ function LoginLoading() {
   return (
     <div className="auth-loading">
       <div className="auth-loading-dot" />
-      <span>กำลังโหลด...</span>
+      <span>
+        กำลังโหลด Firebase Auth...
+      </span>
     </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<LoginLoading />}>
+    <Suspense
+      fallback={<LoginLoading />}
+    >
       <LoginContent />
     </Suspense>
   );

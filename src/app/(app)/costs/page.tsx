@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { useSellerData } from "@/components/seller-data-provider";
+import { DataEmptyState } from "@/components/data-empty-state";
 import { PlatformCostOverviewChart } from "@/components/platform-cost-overview-chart";
 import { FeeBreakdownChart } from "@/components/fee-breakdown-chart";
 import { aggregateBy, feeKeys, feeLabels, money, percent, totals } from "@/lib/analytics";
 
 export default function CostsPage() {
-  const { rows } = useSellerData();
+  const { rows, ready } = useSellerData();
 
   const platforms = useMemo(
     () => ["ทุกช่องทาง", ...Array.from(new Set(rows.map((row) => row.channel)))],
@@ -15,6 +16,24 @@ export default function CostsPage() {
   );
 
   const [selected, setSelected] = useState("ทุกช่องทาง");
+
+  if (!ready) {
+    return (
+      <section className="card data-loading-state">
+        <div className="auth-loading-dot" />
+        <span>กำลังเตรียมข้อมูลร้าน...</span>
+      </section>
+    );
+  }
+
+  if (rows.length === 0) {
+    return (
+      <DataEmptyState
+        title="ยังไม่มีข้อมูลต้นทุน Platform"
+        description="นำเข้าข้อมูลร้านก่อน แล้ว LurJing จะคำนวณ Fee, Ads, Affiliate และกำไรจริงจากข้อมูลของคุณ"
+      />
+    );
+  }
 
   const filtered =
     selected === "ทุกช่องทาง"

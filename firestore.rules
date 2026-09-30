@@ -1,0 +1,47 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      function isOwner() {
+        return request.auth != null
+          && request.auth.uid == userId;
+      }
+
+      allow read: if isOwner();
+
+      allow create: if isOwner()
+        && request.resource.data.id == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == "user"
+        && (
+          request.resource.data.plan == "Free"
+          || request.resource.data.plan == "Demo"
+        )
+        && request.resource.data.status == "active";
+
+      allow update: if isOwner()
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.plan == resource.data.plan
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            "displayName",
+            "storeName",
+            "phone",
+            "updatedAt",
+            "lastLoginAt",
+            "emailVerified",
+            "providerId",
+            "termsAcceptedAt"
+          ]);
+
+      allow delete: if false;
+    }
+  }
+}

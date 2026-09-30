@@ -40,6 +40,7 @@ export default function RegisterPage() {
       storeName,
       email,
       password,
+      termsAcceptedAt: new Date().toISOString(),
     });
 
     if (!result.ok) {

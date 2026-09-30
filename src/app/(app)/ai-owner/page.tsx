@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSellerData } from "@/components/seller-data-provider";
+import { DataEmptyState } from "@/components/data-empty-state";
 import { aggregateBy, feeKeys, feeLabels, money, percent, totals } from "@/lib/analytics";
 
 interface Message {
@@ -10,11 +11,29 @@ interface Message {
 }
 
 export default function AiOwnerPage() {
-  const { rows } = useSellerData();
+  const { rows, ready } = useSellerData();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", text: "ลองถามว่า “TikTok เสียค่าอะไรเยอะสุด”, “เดือนนี้กำไรเท่าไร” หรือ “สินค้าไหนเสี่ยง”" },
   ]);
+
+  if (!ready) {
+    return (
+      <section className="card data-loading-state">
+        <div className="auth-loading-dot" />
+        <span>กำลังเตรียมข้อมูลร้าน...</span>
+      </section>
+    );
+  }
+
+  if (rows.length === 0) {
+    return (
+      <DataEmptyState
+        title="AI Owner ยังไม่มีข้อมูลให้วิเคราะห์"
+        description="นำเข้าข้อมูลร้านก่อน แล้ว AI Owner จะตอบจากยอดขาย ต้นทุน Fee Ads Affiliate และ SKU ของร้านคุณ"
+      />
+    );
+  }
 
   const ask = (question: string) => {
     const text = question.trim();

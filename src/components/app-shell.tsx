@@ -22,8 +22,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { reset } = useSellerData();
   const { user, logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push("/");
   };
 
@@ -63,7 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <button className="button secondary full" onClick={reset}>
-            รีเซ็ต Demo Data
+            {user?.isDemo ? "รีเซ็ต Demo Data" : "ล้างข้อมูล Import"}
           </button>
           <button className="button ghost full" onClick={handleLogout}>
             ออกจากระบบ

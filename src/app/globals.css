@@ -1388,10 +1388,19 @@ video {
   display:grid;
   gap:1px;
 }
+
+.landing-brand strong {
+      font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 26px;
+}
+
+
 .landing-brand small,
 .auth-brand small {
   color:var(--muted);
   font-size:10px;
+  letter-spacing: 0.19rem;
 }
 .landing-logo {
   width:38px;
@@ -3745,7 +3754,7 @@ tbody tr:hover {
 }
 
 .auth-brand div small {
-  letter-spacing: 0.085rem;
+  letter-spacing: 0.33rem;
 }
 
 .landing-brand small,
@@ -4195,6 +4204,114 @@ tbody tr:hover {
     height: 70px;
   }
 }
-
 /* Dark system preference deliberately does not auto-switch the product.
    LurJing stays calm/light by design for this POC. */
+
+
+/* Real-user empty data state v1.4 */
+.data-empty-state {
+  min-height: 390px;
+  display: grid;
+  grid-template-columns: minmax(180px, .72fr) minmax(0, 1.28fr);
+  align-items: center;
+  gap: 42px;
+  padding: clamp(28px, 5vw, 64px);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(167,230,109,.24), transparent 16rem),
+    radial-gradient(circle at 88% 86%, rgba(114,205,186,.14), transparent 17rem),
+    #fff;
+}
+
+.data-empty-visual {
+  position: relative;
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+  border-radius: 42px;
+  background:
+    linear-gradient(145deg, #eff9e8, #f8fcf5);
+  border: 1px solid #dcead6;
+}
+
+.data-empty-visual img {
+  width: min(130px, 72%);
+  height: auto;
+  filter: drop-shadow(0 18px 25px rgba(35,93,65,.14));
+}
+
+.data-empty-spark {
+  position: absolute;
+  border-radius: 999px;
+  background: #ffd66b;
+}
+
+.data-empty-spark.spark-one {
+  width: 17px;
+  height: 17px;
+  right: 20%;
+  top: 20%;
+}
+
+.data-empty-spark.spark-two {
+  width: 9px;
+  height: 9px;
+  left: 22%;
+  bottom: 22%;
+  background: #75cfb0;
+}
+
+.data-empty-copy {
+  max-width: 650px;
+}
+
+.data-empty-copy h2 {
+  margin: 6px 0 10px;
+  font-size: clamp(24px, 3vw, 36px);
+  color: #173a31;
+}
+
+.data-empty-copy > p:not(.eyebrow) {
+  margin: 0;
+  max-width: 580px;
+  color: #6f8076;
+  line-height: 1.75;
+}
+
+.data-empty-copy small {
+  display: block;
+  margin-top: 18px;
+  color: #839087;
+  font-size: 10px;
+}
+
+.data-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.data-loading-state {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .data-empty-state {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .data-empty-visual {
+    min-height: 170px;
+  }
+
+  .data-empty-actions {
+    display: grid;
+  }
+}

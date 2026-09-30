@@ -7,7 +7,7 @@ export default function TermsPage() {
     <div className="legal-page">
       <header className="legal-nav">
         <Link href="/" className="landing-brand">
-          <BrandMark size={32} />
+          <BrandMark size={80} />
           <div>
             <strong>เหลือจริง</strong>
             <small>Seller Profit</small>
