@@ -1,4 +1,7 @@
-export type FeedbackModerationStatus = "pending" | "approved" | "rejected";
+export type FeedbackModerationStatus =
+  | "pending"
+  | "approved"
+  | "rejected";
 
 export interface FeedbackItem {
   id: string;
@@ -11,4 +14,5 @@ export interface FeedbackItem {
   moderationStatus: FeedbackModerationStatus;
   featured: boolean;
   createdAt: string;
+  updatedAt?: string;
 }

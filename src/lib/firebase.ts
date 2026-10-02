@@ -42,6 +42,9 @@ function getFirebaseConfig(): FirebaseOptions {
     appId: cleanEnv(
       process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     ),
+    measurementId: cleanEnv(
+      process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+    ),
   };
 }
 

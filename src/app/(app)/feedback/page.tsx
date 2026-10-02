@@ -1,67 +1,212 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
 import { useAuth } from "@/components/auth-provider";
 import { StarRating } from "@/components/star-rating";
-import { addFeedback, readFeedback } from "@/lib/feedback";
+import {
+  getFeedbackErrorMessage,
+  listMyFeedback,
+  submitFeedback,
+} from "@/lib/feedback";
+import { trackImportantEvent } from "@/lib/product-analytics";
 import type { FeedbackItem } from "@/types/feedback";
 
 export default function FeedbackPage() {
-  const { user } = useAuth();
-  const [rating, setRating] = useState(5);
-  const [message, setMessage] = useState("");
-  const [allowPublic, setAllowPublic] = useState(true);
-  const [submitted, setSubmitted] = useState(false);
-  const [version, setVersion] = useState(0);
+  const {
+    user,
+    ready: authReady,
+  } = useAuth();
 
-  const myFeedback = useMemo(
-    () =>
-      readFeedback().filter((item) => item.userId === user?.id),
-    [user?.id, version],
-  );
+  const [rating, setRating] =
+    useState(5);
 
-  const submit = (event: FormEvent) => {
+  const [message, setMessage] =
+    useState("");
+
+  const [
+    allowPublic,
+    setAllowPublic,
+  ] = useState(true);
+
+  const [
+    myFeedback,
+    setMyFeedback,
+  ] = useState<FeedbackItem[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
+
+  const [
+    submitted,
+    setSubmitted,
+  ] = useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const loadFeedback =
+    useCallback(async () => {
+      if (!authReady) {
+        return;
+      }
+
+      if (!user) {
+        setMyFeedback([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError("");
+
+      try {
+        const items =
+          await listMyFeedback(
+            user.id,
+          );
+
+        setMyFeedback(items);
+      } catch (loadError) {
+        console.warn(
+          "[Feedback] load failed",
+          loadError,
+        );
+
+        setError(
+          getFeedbackErrorMessage(
+            loadError,
+          ),
+        );
+      } finally {
+        setLoading(false);
+      }
+    }, [
+      authReady,
+      user,
+    ]);
+
+  useEffect(() => {
+    void loadFeedback();
+  }, [loadFeedback]);
+
+  const submit = async (
+    event: FormEvent,
+  ) => {
     event.preventDefault();
 
-    if (!user || !message.trim()) return;
+    if (submitting) return;
 
-    const item: FeedbackItem = {
-      id: crypto.randomUUID(),
-      userId: user.id,
-      displayName: user.displayName,
-      storeName: user.storeName,
-      rating,
-      message: message.trim(),
-      allowPublic,
-      moderationStatus: "pending",
-      featured: false,
-      createdAt: new Date().toISOString(),
-    };
+    if (!user) {
+      setError(
+        "ไม่พบ Firebase session กรุณา Login ใหม่",
+      );
+      return;
+    }
 
-    addFeedback(item);
-    setMessage("");
-    setRating(5);
-    setAllowPublic(true);
-    setSubmitted(true);
-    setVersion((value) => value + 1);
+    const cleanMessage =
+      message.trim();
 
-    window.setTimeout(() => setSubmitted(false), 2500);
+    if (
+      cleanMessage.length < 10
+    ) {
+      setError(
+        "กรุณาเขียน Feedback อย่างน้อย 10 ตัวอักษร",
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitted(false);
+    setError("");
+
+    try {
+      await submitFeedback(
+        user,
+        {
+          rating,
+          message:
+            cleanMessage,
+          allowPublic,
+        },
+      );
+
+      // Analytics failure must never block Feedback submission.
+      void trackImportantEvent(
+        "feedback_submitted",
+        user,
+        {
+          rating,
+          allow_public:
+            allowPublic,
+        },
+      );
+
+      setMessage("");
+      setRating(5);
+      setAllowPublic(true);
+      setSubmitted(true);
+
+      await loadFeedback();
+
+      window.setTimeout(
+        () =>
+          setSubmitted(false),
+        2500,
+      );
+    } catch (submitError) {
+      console.warn(
+        "[Feedback] submit failed",
+        submitError,
+      );
+
+      setError(
+        getFeedbackErrorMessage(
+          submitError,
+        ),
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="feedback-page">
       <section className="card feedback-hero">
         <div>
-          <p className="eyebrow">PRODUCT FEEDBACK</p>
-          <h2>ช่วยบอกหน่อยว่า “เหลือจริง” ใช้แล้วเป็นยังไง</h2>
+          <p className="eyebrow">
+            PRODUCT FEEDBACK
+          </p>
+
+          <h2>
+            ช่วยบอกหน่อยว่า “เหลือจริง”
+            ใช้แล้วเป็นยังไง
+          </h2>
+
           <p className="muted">
-            ให้ดาวและบอกสิ่งที่ชอบหรืออยากให้ปรับ เพื่อช่วยกำหนดว่าเราควรพัฒนาอะไรต่อ
+            Feedback จะถูกเก็บใน Firebase Firestore
+            และแสดงให้ Admin ตรวจสอบก่อน
+            โดยตอนนี้ยังไม่ถูกนำไปแสดงบน Landing Page
           </p>
         </div>
 
         <div className="feedback-summary-badge">
-          <span>Feedback ของคุณ</span>
-          <strong>{myFeedback.length}</strong>
+          <span>
+            Feedback ของคุณ
+          </span>
+          <strong>
+            {myFeedback.length}
+          </strong>
           <small>ครั้ง</small>
         </div>
       </section>
@@ -70,61 +215,126 @@ export default function FeedbackPage() {
         <article className="card">
           <div className="section-head">
             <div>
-              <p className="eyebrow">RATE EXPERIENCE</p>
-              <h2>ประสบการณ์โดยรวม</h2>
+              <p className="eyebrow">
+                RATE EXPERIENCE
+              </p>
+              <h2>
+                ประสบการณ์โดยรวม
+              </h2>
             </div>
           </div>
 
-          <form className="feedback-form" onSubmit={submit}>
+          <form
+            className="feedback-form"
+            onSubmit={submit}
+          >
             <div className="feedback-rating-box">
               <span>ให้คะแนน</span>
-              <StarRating value={rating} onChange={setRating} size="lg" />
-              <strong>{rating}.0 / 5</strong>
+
+              <StarRating
+                value={rating}
+                onChange={setRating}
+                size="lg"
+              />
+
+              <strong>
+                {rating}.0 / 5
+              </strong>
             </div>
 
             <label className="feedback-field">
-              <span>ความคิดเห็น</span>
+              <span>
+                ความคิดเห็น
+              </span>
+
               <textarea
                 required
                 minLength={10}
                 maxLength={600}
                 rows={7}
                 value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                placeholder="เช่น ชอบที่เห็นกำไรจริงแยก Platform ได้ แต่ยังอยากให้ Import จาก Shopee ง่ายขึ้น..."
+                onChange={(event) => {
+                  setMessage(
+                    event.target.value,
+                  );
+
+                  if (error) {
+                    setError("");
+                  }
+                }}
+                placeholder="เช่น ชอบที่เห็นกำไรจริงแยก Platform ได้ แต่ยังอยากให้ Import ง่ายขึ้น..."
               />
-              <small>{message.length}/600 ตัวอักษร</small>
+
+              <small>
+                {message.length}/600 ตัวอักษร
+                {message.trim().length >
+                  0 &&
+                message.trim().length <
+                  10
+                  ? " • อย่างน้อย 10 ตัวอักษร"
+                  : ""}
+              </small>
             </label>
 
             <label className="public-feedback-check">
               <input
                 type="checkbox"
-                checked={allowPublic}
-                onChange={(event) => setAllowPublic(event.target.checked)}
+                checked={
+                  allowPublic
+                }
+                onChange={(event) =>
+                  setAllowPublic(
+                    event.target.checked,
+                  )
+                }
               />
+
               <span>
-                อนุญาตให้นำความคิดเห็นนี้ไปแสดงบน Landing Page เป็น Testimonial
-                โดยแสดงชื่อผู้ใช้งานและชื่อร้าน
+                อนุญาตให้ Admin
+                เก็บสถานะว่า Feedback
+                นี้สามารถนำไปใช้เป็น Testimonial
+                ได้ในอนาคต
               </span>
             </label>
 
             <div className="feedback-owner-preview">
-              <span>จะแสดงในชื่อ</span>
-              <strong>{user?.displayName}</strong>
-              <small>{user?.storeName}</small>
+              <span>
+                Feedback จาก
+              </span>
+              <strong>
+                {user?.displayName ??
+                  "กำลังโหลด..."}
+              </strong>
+              <small>
+                {user?.storeName ?? ""}
+              </small>
             </div>
 
+            {error && (
+              <div className="auth-error">
+                {error}
+              </div>
+            )}
+
             <button
+              type="submit"
               className="button primary feedback-submit"
-              disabled={!message.trim() || message.trim().length < 10}
+              disabled={
+                submitting ||
+                !authReady ||
+                !user
+              }
             >
-              ส่ง Feedback
+              {submitting
+                ? "กำลังส่ง..."
+                : "ส่ง Feedback"}
             </button>
 
             {submitted && (
               <div className="feedback-success">
-                ขอบคุณครับ ✓ Feedback ถูกบันทึกแล้ว
-                {allowPublic ? " และจะรอ Admin อนุมัติก่อนแสดงบน Landing Page" : ""}
+                ขอบคุณครับ ✓ Feedback
+                ถูกบันทึกลง Firestore แล้ว
+                และ Admin สามารถดูได้
               </div>
             )}
           </form>
@@ -133,37 +343,75 @@ export default function FeedbackPage() {
         <aside className="card">
           <div className="section-head">
             <div>
-              <p className="eyebrow">YOUR FEEDBACK</p>
-              <h2>ความคิดเห็นที่ผ่านมา</h2>
+              <p className="eyebrow">
+                YOUR FEEDBACK
+              </p>
+              <h2>
+                ความคิดเห็นที่ผ่านมา
+              </h2>
             </div>
           </div>
 
           <div className="feedback-history">
-            {myFeedback.length === 0 ? (
+            {loading ? (
               <div className="empty-feedback">
-                ยังไม่มี Feedback ลองส่งความคิดเห็นแรกของคุณได้เลย
+                กำลังโหลด Feedback...
+              </div>
+            ) : myFeedback.length ===
+              0 ? (
+              <div className="empty-feedback">
+                ยังไม่มี Feedback
+                ลองส่งความคิดเห็นแรกของคุณได้เลย
               </div>
             ) : (
-              myFeedback.map((item) => (
-                <article key={item.id} className="feedback-history-card">
-                  <div className="feedback-history-head">
-                    <StarRating value={item.rating} readonly size="sm" />
-                    <span>
-                      {new Intl.DateTimeFormat("th-TH", {
-                        dateStyle: "medium",
-                      }).format(new Date(item.createdAt))}
-                    </span>
-                  </div>
+              myFeedback.map(
+                (item) => (
+                  <article
+                    key={item.id}
+                    className="feedback-history-card"
+                  >
+                    <div className="feedback-history-head">
+                      <StarRating
+                        value={
+                          item.rating
+                        }
+                        readonly
+                        size="sm"
+                      />
 
-                  <p>{item.message}</p>
+                      <span>
+                        {new Intl.DateTimeFormat(
+                          "th-TH",
+                          {
+                            dateStyle:
+                              "medium",
+                          },
+                        ).format(
+                          new Date(
+                            item.createdAt,
+                          ),
+                        )}
+                      </span>
+                    </div>
 
-                  <div className="feedback-history-status">
-                    <span className={item.allowPublic && item.moderationStatus === "approved" ? "public" : "private"}>
-                      {!item.allowPublic ? "Private" : item.moderationStatus === "approved" ? "อนุมัติแล้ว" : item.moderationStatus === "rejected" ? "ไม่ผ่านการอนุมัติ" : "รอตรวจสอบ"}
-                    </span>
-                  </div>
-                </article>
-              ))
+                    <p>
+                      {item.message}
+                    </p>
+
+                    <div className="feedback-history-status">
+                      <span className="private">
+                        {item.moderationStatus ===
+                        "approved"
+                          ? "Admin อนุมัติแล้ว"
+                          : item.moderationStatus ===
+                              "rejected"
+                            ? "ไม่ผ่านการอนุมัติ"
+                            : "รอ Admin ตรวจสอบ"}
+                      </span>
+                    </div>
+                  </article>
+                ),
+              )
             )}
           </div>
         </aside>

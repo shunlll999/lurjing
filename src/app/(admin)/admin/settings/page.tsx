@@ -1,61 +1,153 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { writeAccounts } from "@/lib/auth";
-import { feedbackStorageKey } from "@/lib/feedback";
+import {
+  useEffect,
+  useState,
+} from "react";
 
-const settingsKey = "lurjing:admin-settings";
+import { useAuth } from "@/components/auth-provider";
+import {
+  getTrackingSettings,
+  saveTrackingSettings,
+} from "@/lib/product-analytics";
+import { setGaCollectionEnabled } from "@/lib/ga4";
+import { writeAccounts } from "@/lib/auth";
+import type { TrackingSettings } from "@/types/analytics";
+
+const settingsKey =
+  "lurjing:admin-settings";
 
 interface POCSettings {
-  testimonialsEnabled: boolean;
-  maxTestimonials: number;
   demoAccountEnabled: boolean;
 }
 
 const defaults: POCSettings = {
-  testimonialsEnabled: true,
-  maxTestimonials: 6,
   demoAccountEnabled: true,
 };
 
+const trackingDefaults: TrackingSettings = {
+  enabled: true,
+  ga4Enabled: true,
+  firestoreEnabled: true,
+};
+
 export default function AdminSettingsPage() {
-  const [settings, setSettings] = useState<POCSettings>(defaults);
-  const [saved, setSaved] = useState(false);
+  const { user } = useAuth();
+
+  const [settings, setSettings] =
+    useState<POCSettings>(defaults);
+
+  const [
+    tracking,
+    setTracking,
+  ] = useState<TrackingSettings>(
+    trackingDefaults,
+  );
+
+  const [saved, setSaved] =
+    useState(false);
+  const [
+    trackingSaved,
+    setTrackingSaved,
+  ] = useState(false);
+  const [
+    trackingError,
+    setTrackingError,
+  ] = useState("");
 
   useEffect(() => {
     try {
-      const raw = window.localStorage.getItem(settingsKey);
-      if (raw) setSettings({ ...defaults, ...JSON.parse(raw) });
+      const raw =
+        window.localStorage.getItem(
+          settingsKey,
+        );
+
+      if (raw) {
+        setSettings({
+          ...defaults,
+          ...JSON.parse(raw),
+        });
+      }
     } catch {
       setSettings(defaults);
     }
+
+    void getTrackingSettings(true)
+      .then(setTracking)
+      .catch(() =>
+        setTracking(
+          trackingDefaults,
+        ),
+      );
   }, []);
 
-  const save = () => {
-    window.localStorage.setItem(settingsKey, JSON.stringify(settings));
+  const saveLocal = () => {
+    window.localStorage.setItem(
+      settingsKey,
+      JSON.stringify(settings),
+    );
+
     setSaved(true);
-    window.setTimeout(() => setSaved(false), 1600);
+
+    window.setTimeout(
+      () => setSaved(false),
+      1600,
+    );
   };
 
-  const clearFeedback = () => {
-    if (!window.confirm("ลบ Feedback ทั้งหมดใน browser นี้หรือไม่?")) return;
-    window.localStorage.removeItem(feedbackStorageKey);
-    window.alert("ลบ Feedback ทั้งหมดแล้ว");
+  const saveTracking = async () => {
+    if (!user) return;
+
+    setTrackingError("");
+
+    try {
+      const next =
+        await saveTrackingSettings(
+          tracking,
+          user,
+        );
+
+      setTracking(next);
+
+      await setGaCollectionEnabled(
+        Boolean(
+          next.enabled &&
+            next.ga4Enabled,
+        ),
+      );
+
+      setTrackingSaved(true);
+
+      window.setTimeout(
+        () =>
+          setTrackingSaved(false),
+        1600,
+      );
+    } catch (error) {
+      console.error(
+        "[Admin Settings] tracking save failed",
+        error,
+      );
+
+      setTrackingError(
+        "บันทึก Tracking Settings ไม่สำเร็จ",
+      );
+    }
   };
 
   const clearUsers = () => {
-    if (!window.confirm("ลบ Registered users ทั้งหมดใน browser นี้หรือไม่?")) return;
-    writeAccounts([]);
-    window.alert("ลบ Registered users ทั้งหมดแล้ว");
-  };
+    if (
+      !window.confirm(
+        "ล้างเฉพาะ POC user mirror ใน browser นี้หรือไม่? Firebase Auth / Firestore จะไม่ถูกลบ",
+      )
+    ) {
+      return;
+    }
 
-  const resetEverything = () => {
-    if (!window.confirm("รีเซ็ต Users, Feedback และ Settings ทั้งหมดหรือไม่?")) return;
-    window.localStorage.removeItem(feedbackStorageKey);
-    window.localStorage.removeItem(settingsKey);
     writeAccounts([]);
-    setSettings(defaults);
-    window.alert("POC ถูกรีเซ็ตแล้ว");
+    window.alert(
+      "ล้าง POC user mirror แล้ว",
+    );
   };
 
   return (
@@ -64,24 +156,42 @@ export default function AdminSettingsPage() {
         <article className="admin-card">
           <div className="admin-card-head">
             <div>
-              <p className="eyebrow">LANDING PAGE</p>
-              <h2>Testimonial settings</h2>
+              <p className="eyebrow">
+                ANALYTICS
+              </p>
+              <h2>
+                Tracking controls
+              </h2>
+              <p>
+                ปิดได้ตลอดเวลาโดยไม่กระทบ
+                Auth, Dashboard หรือ Feedback
+              </p>
             </div>
           </div>
 
           <div className="admin-setting-list">
             <label>
               <div>
-                <strong>เปิด Testimonial section</strong>
-                <span>แสดง Feedback ที่ Approved บน Landing Page</span>
+                <strong>
+                  เปิด Product Tracking
+                </strong>
+                <span>
+                  Master switch
+                  สำหรับ GA4 และ Firestore Analytics
+                </span>
               </div>
+
               <input
                 type="checkbox"
-                checked={settings.testimonialsEnabled}
+                checked={
+                  tracking.enabled
+                }
                 onChange={(event) =>
-                  setSettings({
-                    ...settings,
-                    testimonialsEnabled: event.target.checked,
+                  setTracking({
+                    ...tracking,
+                    enabled:
+                      event.target
+                        .checked,
                   })
                 }
               />
@@ -89,22 +199,29 @@ export default function AdminSettingsPage() {
 
             <label>
               <div>
-                <strong>จำนวน Testimonial สูงสุด</strong>
-                <span>Featured จะถูกเรียงขึ้นก่อน</span>
+                <strong>
+                  Google Analytics 4
+                </strong>
+                <span>
+                  Page View + UI Click
+                  ไม่ส่ง email หรือชื่อผู้ใช้
+                </span>
               </div>
+
               <input
-                className="admin-number-input"
-                type="number"
-                min={1}
-                max={12}
-                value={settings.maxTestimonials}
+                type="checkbox"
+                checked={
+                  tracking.ga4Enabled
+                }
+                disabled={
+                  !tracking.enabled
+                }
                 onChange={(event) =>
-                  setSettings({
-                    ...settings,
-                    maxTestimonials: Math.min(
-                      12,
-                      Math.max(1, Number(event.target.value) || 1),
-                    ),
+                  setTracking({
+                    ...tracking,
+                    ga4Enabled:
+                      event.target
+                        .checked,
                   })
                 }
               />
@@ -112,48 +229,130 @@ export default function AdminSettingsPage() {
 
             <label>
               <div>
-                <strong>Demo Account</strong>
-                <span>POC setting สำหรับทดสอบ UX</span>
+                <strong>
+                  Firestore Important Events
+                </strong>
+                <span>
+                  Register, Login, Profile,
+                  Import และ Feedback เท่านั้น
+                </span>
               </div>
+
               <input
                 type="checkbox"
-                checked={settings.demoAccountEnabled}
+                checked={
+                  tracking.firestoreEnabled
+                }
+                disabled={
+                  !tracking.enabled
+                }
                 onChange={(event) =>
-                  setSettings({
-                    ...settings,
-                    demoAccountEnabled: event.target.checked,
+                  setTracking({
+                    ...tracking,
+                    firestoreEnabled:
+                      event.target
+                        .checked,
                   })
                 }
               />
             </label>
           </div>
 
-          <button className="button primary" onClick={save}>
-            {saved ? "บันทึกแล้ว ✓" : "บันทึก Settings"}
+          {trackingError && (
+            <div className="auth-error">
+              {trackingError}
+            </div>
+          )}
+
+          <button
+            className="button primary"
+            onClick={() =>
+              void saveTracking()
+            }
+          >
+            {trackingSaved
+              ? "บันทึกแล้ว ✓"
+              : "บันทึก Tracking"}
+          </button>
+        </article>
+
+        <article className="admin-card">
+          <div className="admin-card-head">
+            <div>
+              <p className="eyebrow">
+                POC
+              </p>
+              <h2>
+                Demo settings
+              </h2>
+            </div>
+          </div>
+
+          <div className="admin-setting-list">
+            <label>
+              <div>
+                <strong>
+                  Demo Account
+                </strong>
+                <span>
+                  POC setting
+                  สำหรับทดสอบ UX
+                </span>
+              </div>
+
+              <input
+                type="checkbox"
+                checked={
+                  settings.demoAccountEnabled
+                }
+                onChange={(event) =>
+                  setSettings({
+                    ...settings,
+                    demoAccountEnabled:
+                      event.target
+                        .checked,
+                  })
+                }
+              />
+            </label>
+          </div>
+
+          <button
+            className="button secondary"
+            onClick={saveLocal}
+          >
+            {saved
+              ? "บันทึกแล้ว ✓"
+              : "บันทึก Demo Setting"}
           </button>
         </article>
 
         <article className="admin-card danger-zone">
           <div className="admin-card-head">
             <div>
-              <p className="eyebrow">DANGER ZONE</p>
-              <h2>Reset POC data</h2>
-              <p>ล้างข้อมูลเฉพาะ browser ที่กำลังใช้อยู่</p>
+              <p className="eyebrow">
+                LOCAL POC
+              </p>
+              <h2>
+                Browser mirror
+              </h2>
+              <p>
+                ไม่ลบข้อมูล Firebase จริง
+              </p>
             </div>
           </div>
 
           <div className="danger-action-list">
-            <button onClick={clearFeedback}>
-              <strong>ลบ Feedback ทั้งหมด</strong>
-              <span>ไม่กระทบ User</span>
-            </button>
-            <button onClick={clearUsers}>
-              <strong>ลบ Registered users</strong>
-              <span>Demo / Admin system account ยังอยู่</span>
-            </button>
-            <button className="critical" onClick={resetEverything}>
-              <strong>Reset ทุกอย่าง</strong>
-              <span>Users + Feedback + Settings</span>
+            <button
+              onClick={clearUsers}
+            >
+              <strong>
+                ล้าง Local User Mirror
+              </strong>
+              <span>
+                Firebase Auth /
+                Firestore ไม่ได้รับผลกระทบ
+              </span>
             </button>
           </div>
         </article>

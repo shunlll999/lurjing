@@ -1,56 +1,136 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import { readAccounts } from "@/lib/auth";
-import { readFeedback } from "@/lib/feedback";
+import { listAdminFeedback } from "@/lib/feedback";
+import { listAnalyticsEvents } from "@/lib/product-analytics";
 import type { StoredAccount } from "@/types/auth";
 import type { FeedbackItem } from "@/types/feedback";
+import type { AnalyticsEventItem } from "@/types/analytics";
 
 export default function AdminOverviewPage() {
-  const [accounts, setAccounts] = useState<StoredAccount[]>([]);
-  const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
+  const [accounts, setAccounts] =
+    useState<StoredAccount[]>([]);
+  const [feedback, setFeedback] =
+    useState<FeedbackItem[]>([]);
+  const [events, setEvents] =
+    useState<AnalyticsEventItem[]>([]);
 
   useEffect(() => {
     setAccounts(readAccounts());
-    setFeedback(readFeedback());
+
+    void Promise.all([
+      listAdminFeedback(100),
+      listAnalyticsEvents(100),
+    ])
+      .then(
+        ([
+          feedbackItems,
+          analyticsItems,
+        ]) => {
+          setFeedback(
+            feedbackItems,
+          );
+          setEvents(
+            analyticsItems,
+          );
+        },
+      )
+      .catch((error) => {
+        console.warn(
+          "[Admin Overview] Firestore summary load failed",
+          error,
+        );
+      });
   }, []);
 
   const stats = useMemo(() => {
-    const active = accounts.filter((item) => item.status === "active").length;
-    const pending = feedback.filter((item) => item.moderationStatus === "pending").length;
-    const approved = feedback.filter((item) => item.moderationStatus === "approved").length;
-    const featured = feedback.filter((item) => item.featured).length;
+    const active =
+      accounts.filter(
+        (item) =>
+          item.status === "active",
+      ).length;
+
+    const pending =
+      feedback.filter(
+        (item) =>
+          item.moderationStatus ===
+          "pending",
+      ).length;
+
     const average =
       feedback.length > 0
-        ? feedback.reduce((sum, item) => sum + item.rating, 0) / feedback.length
+        ? feedback.reduce(
+            (sum, item) =>
+              sum + item.rating,
+            0,
+          ) / feedback.length
         : 0;
 
-    return { active, pending, approved, featured, average };
+    return {
+      active,
+      pending,
+      average,
+    };
   }, [accounts, feedback]);
 
   return (
     <div className="admin-page">
       <section className="admin-stat-grid">
         <article className="admin-stat">
-          <span>Registered users</span>
-          <strong>{accounts.length}</strong>
-          <small>{stats.active} active</small>
+          <span>
+            Registered users
+          </span>
+          <strong>
+            {accounts.length}
+          </strong>
+          <small>
+            {stats.active} active
+          </small>
         </article>
+
         <article className="admin-stat">
           <span>Feedback</span>
-          <strong>{feedback.length}</strong>
-          <small>{stats.pending} pending</small>
+          <strong>
+            {feedback.length}
+          </strong>
+          <small>
+            {stats.pending} pending
+          </small>
         </article>
+
         <article className="admin-stat">
-          <span>Approved</span>
-          <strong>{stats.approved}</strong>
-          <small>{stats.featured} featured</small>
+          <span>
+            Important events
+          </span>
+          <strong>
+            {events.length}
+          </strong>
+          <small>
+            latest 100
+          </small>
         </article>
+
         <article className="admin-stat">
-          <span>Average rating</span>
-          <strong>{stats.average ? stats.average.toFixed(1) : "-"}</strong>
-          <small>all feedback</small>
+          <span>
+            Average rating
+          </span>
+          <strong>
+            {stats.average
+              ? stats.average.toFixed(
+                  1,
+                )
+              : "-"}
+          </strong>
+          <small>
+            Firestore feedback
+          </small>
         </article>
       </section>
 
@@ -58,28 +138,50 @@ export default function AdminOverviewPage() {
         <article className="admin-card">
           <div className="admin-card-head">
             <div>
-              <p className="eyebrow">MODERATION</p>
-              <h2>Feedback ที่รอตรวจ</h2>
+              <p className="eyebrow">
+                MODERATION
+              </p>
+              <h2>
+                Feedback ที่รอตรวจ
+              </h2>
             </div>
-            <Link href="/admin/feedback">ดูทั้งหมด →</Link>
+            <Link href="/admin/feedback">
+              ดูทั้งหมด →
+            </Link>
           </div>
 
           <div className="admin-list">
             {feedback
-              .filter((item) => item.moderationStatus === "pending")
+              .filter(
+                (item) =>
+                  item.moderationStatus ===
+                  "pending",
+              )
               .slice(0, 5)
               .map((item) => (
-                <div className="admin-list-row" key={item.id}>
+                <div
+                  className="admin-list-row"
+                  key={item.id}
+                >
                   <div>
-                    <strong>{item.displayName}</strong>
-                    <span>{item.storeName} • {item.rating} ดาว</span>
+                    <strong>
+                      {item.displayName}
+                    </strong>
+                    <span>
+                      {item.storeName}
+                      {" • "}
+                      {item.rating} ดาว
+                    </span>
                   </div>
                   <p>{item.message}</p>
                 </div>
               ))}
 
             {stats.pending === 0 && (
-              <div className="admin-empty">ไม่มี Feedback ที่รอตรวจสอบ</div>
+              <div className="admin-empty">
+                ไม่มี Feedback
+                ที่รอตรวจสอบ
+              </div>
             )}
           </div>
         </article>
@@ -87,25 +189,54 @@ export default function AdminOverviewPage() {
         <article className="admin-card">
           <div className="admin-card-head">
             <div>
-              <p className="eyebrow">QUICK ACTIONS</p>
-              <h2>จัดการ POC</h2>
+              <p className="eyebrow">
+                QUICK ACTIONS
+              </p>
+              <h2>
+                จัดการ POC
+              </h2>
             </div>
           </div>
 
           <div className="admin-action-list">
             <Link href="/admin/users">
-              <strong>Users</strong>
-              <span>เปิด/ปิด และลบบัญชีผู้ใช้</span>
+              <strong>
+                Users
+              </strong>
+              <span>
+                ดูบัญชีผู้ใช้
+              </span>
               <b>→</b>
             </Link>
+
+            <Link href="/admin/analytics">
+              <strong>
+                Product Analytics
+              </strong>
+              <span>
+                GA4 interaction +
+                Firestore important events
+              </span>
+              <b>→</b>
+            </Link>
+
             <Link href="/admin/feedback">
-              <strong>Feedback & Testimonials</strong>
-              <span>Approve / Reject / Feature บน Landing</span>
+              <strong>
+                Feedback
+              </strong>
+              <span>
+                ดูและ Moderate Feedback จริง
+              </span>
               <b>→</b>
             </Link>
+
             <Link href="/admin/settings">
-              <strong>POC Settings</strong>
-              <span>ตั้งค่า Landing และรีเซ็ตข้อมูล Demo</span>
+              <strong>
+                Settings
+              </strong>
+              <span>
+                เปิด/ปิด Tracking ได้ตลอด
+              </span>
               <b>→</b>
             </Link>
           </div>

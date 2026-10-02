@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 import { SellerDataProvider } from "@/components/seller-data-provider";
 import { AuthProvider } from "@/components/auth-provider";
+import { AnalyticsProvider } from "@/components/analytics-provider";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lurjing.com";
 
@@ -30,7 +31,9 @@ export default function RootLayout({
     <html lang="th">
       <body>
         <AuthProvider>
-          <SellerDataProvider>{children}</SellerDataProvider>
+          <AnalyticsProvider>
+            <SellerDataProvider>{children}</SellerDataProvider>
+          </AnalyticsProvider>
         </AuthProvider>
       </body>
     </html>

@@ -8,6 +8,7 @@ import { BrandMark } from "@/components/brand-logo";
 const items = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/users", label: "Users" },
+  { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/feedback", label: "Feedback" },
   { href: "/admin/settings", label: "POC Settings" },
 ] as const;
@@ -17,8 +18,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  const signOut = () => {
-    logout();
+  const signOut = async () => {
+    await logout();
     router.push("/");
   };
 
@@ -56,7 +57,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link className="button secondary full" href="/dashboard">
             เปิด User App
           </Link>
-          <button className="button ghost full" onClick={signOut}>
+          <button className="button ghost full" onClick={() => void signOut()}>
             ออกจากระบบ
           </button>
         </div>

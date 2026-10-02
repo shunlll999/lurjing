@@ -26,12 +26,12 @@ import {
 import { getFirebaseAuth } from "@/lib/firebase";
 import {
   createUserProfile,
-  getUserProfile,
   ensureUserProfile,
   touchUserLogin,
   updateOwnUserProfile,
 } from "@/lib/user-profile";
 import type { UserProfile } from "@/types/auth";
+import { trackImportantEvent } from "@/lib/product-analytics";
 
 interface RegisterInput {
   displayName: string;
@@ -159,6 +159,10 @@ export function AuthProvider({
     useState(false);
 
   useEffect(() => {
+    console.info(
+      "[LurJing Auth] Firestore AuthProvider v1.4.1 loaded",
+    );
+
     let unsubscribe = () => {};
 
     try {
@@ -175,8 +179,10 @@ export function AuthProvider({
             }
 
             try {
+              // Important for users created before Firestore profile support:
+              // create users/{uid} automatically if it does not exist yet.
               const profile =
-                await getUserProfile(
+                await ensureUserProfile(
                   firebaseUser,
                 );
 
@@ -287,6 +293,14 @@ export function AuthProvider({
           });
         }
 
+        void trackImportantEvent(
+          "user_login",
+          nextProfile,
+          {
+            provider: "password",
+          },
+        );
+
         return {
           ok: true,
           destination:
@@ -371,6 +385,14 @@ export function AuthProvider({
           ...profile,
         });
 
+        void trackImportantEvent(
+          "user_registered",
+          profile,
+          {
+            provider: "password",
+          },
+        );
+
         return {
           ok: true,
           destination:
@@ -451,6 +473,12 @@ export function AuthProvider({
           };
         }
 
+        // Old Firebase Auth users may not have a Firestore profile yet.
+        // Ensure users/{uid} exists before updating it.
+        await ensureUserProfile(
+          firebaseUser,
+        );
+
         await updateOwnUserProfile(
           user.id,
           updates,
@@ -477,6 +505,16 @@ export function AuthProvider({
         };
 
         setUser(nextUser);
+
+        void trackImportantEvent(
+          "profile_updated",
+          nextUser,
+          {
+            fields: Object.keys(
+              updates,
+            ).join(","),
+          },
+        );
 
         upsertAccount({
           ...nextUser,

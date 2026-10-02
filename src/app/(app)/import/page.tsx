@@ -3,7 +3,9 @@
 import { DragEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useSellerData } from "@/components/seller-data-provider";
+import { useAuth } from "@/components/auth-provider";
 import { parseSellerCsv } from "@/lib/csv";
+import { trackImportantEvent } from "@/lib/product-analytics";
 
 type ImportState =
   | { type: "idle"; message: "" }
@@ -29,6 +31,7 @@ const schema = [
 
 export default function ImportPage() {
   const { setRows } = useSellerData();
+  const { user } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<ImportState>({ type: "idle", message: "" });
   const [fileName, setFileName] = useState("");
@@ -53,6 +56,18 @@ export default function ImportPage() {
       }
 
       setRows(parsedRows);
+
+      void trackImportantEvent(
+        "csv_imported",
+        user,
+        {
+          row_count: parsedRows.length,
+          file_size_kb: Math.round(
+            file.size / 1024,
+          ),
+        },
+      );
+
       setRowCount(parsedRows.length);
       setState({
         type: "success",
