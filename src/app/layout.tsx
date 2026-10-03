@@ -5,7 +5,7 @@ import { AuthProvider } from "@/components/auth-provider";
 import { AnalyticsProvider } from "@/components/analytics-provider";
 import { CookieConsent } from "@/components/cookie-consent";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lurjing.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lurjing.web.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     title: "เหลือจริง",
     description: "ยอดขายไม่ใช่กำไร มาดูว่าเหลือจริงเท่าไร",
     url: siteUrl,
+    images: ['/assets/images/lurjingmetadata.png'],
     siteName: "เหลือจริง",
     locale: "th_TH",
     type: "website",
