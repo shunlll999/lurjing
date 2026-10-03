@@ -33,6 +33,7 @@ export default function LandingPage() {
           <a href="#features">ฟีเจอร์</a>
           <a href="#how">ทำงานยังไง</a>
           <Link href="/terms">ข้อตกลง</Link>
+          <Link href="/cookies">คุกกี้</Link>
         </nav>
 
         <div className="landing-actions">
@@ -48,7 +49,7 @@ export default function LandingPage() {
       <main>
         <section className="landing-hero">
           <div className="hero-copy">
-            <span className="hero-badge">สำหรับร้านค้าออนไลน์ไทย</span>
+            <span className="hero-badge">Early Access • ฟรีช่วงรับ Feedback</span>
             <h1>
               ยอดขายเยอะ
               <br />
@@ -57,11 +58,12 @@ export default function LandingPage() {
             <p>
               เหลือจริงช่วยรวมต้นทุนจาก Shopee, TikTok Shop และ Lazada
               เพื่อบอกว่า หลังหักทุกอย่างแล้ว ร้านคุณเหลือกำไรจริงเท่าไร
+              ช่วง Early นี้เปิดให้ใช้งานฟรี เพื่อรับ Feedback จากผู้ใช้จริง
             </p>
 
             <div className="hero-actions">
               <Link href="/register" className="button primary large">
-                เริ่มใช้ฟรี
+                เริ่มใช้ฟรี — ไม่มีค่าใช้จ่าย
               </Link>
               <Link href="/login?demo=1" className="button secondary large">
                 ทดลอง Demo
@@ -69,50 +71,107 @@ export default function LandingPage() {
             </div>
 
             <div className="hero-trust">
-              <span>✓ ไม่ต้องเชื่อม API ใน POC</span>
+              <span>✓ ฟรีในช่วง Early ไม่มีค่าใช้จ่ายตอนนี้</span>
               <span>✓ เริ่มจาก CSV ได้</span>
               <span>✓ ดูต้นทุนถึงระดับ SKU</span>
             </div>
           </div>
 
-          <div className="hero-product">
-            <div className="hero-product-top">
-              <span>ภาพรวมร้าน • เดือนนี้</span>
-              <span className="mini-badge">LIVE DEMO</span>
+          <div className="hero-product hero-product-v2">
+            <div className="hero-product-top hero-store-head">
+              <div className="hero-store-identity">
+                <span className="hero-store-avatar">ร</span>
+                <div>
+                  <strong>ร้านตัวอย่าง</strong>
+                  <small>Shopee + TikTok Shop • 30 วันล่าสุด</small>
+                </div>
+              </div>
+              <span className="hero-free-badge">EARLY • FREE</span>
             </div>
 
-            <div className="hero-metrics">
+            <div className="hero-metrics hero-metrics-v2">
               <div>
                 <span>ยอดขาย</span>
                 <strong>฿98,267</strong>
+                <small className="metric-trend up">↑ 12.8%</small>
               </div>
-              <div>
+              <div className="hero-profit-metric">
                 <span>กำไรจริง</span>
                 <strong className="good">฿23,481</strong>
+                <small className="metric-caption">หลังหักค่าใช้จ่ายทั้งหมด</small>
+              </div>
+              <div>
+                <span>Margin</span>
+                <strong>23.9%</strong>
+                <small className="metric-trend up">↑ 2.4 pts</small>
               </div>
             </div>
 
-            <div className="hero-chart">
-              <div className="hero-bars">
-                {[36, 57, 45, 68, 62, 82, 77, 94, 86, 100, 91, 108].map(
-                  (height, index) => (
-                    <span key={index} style={{ height: `${Math.min(height, 100)}%` }} />
-                  ),
-                )}
+            <div className="hero-chart hero-chart-v2">
+              <div className="hero-chart-head">
+                <div>
+                  <strong>ยอดขาย vs กำไรจริง</strong>
+                  <span>12 วันล่าสุด</span>
+                </div>
+                <div className="hero-chart-legend">
+                  <span><i className="legend-sales" />ยอดขาย</span>
+                  <span><i className="legend-profit" />กำไรจริง</span>
+                </div>
               </div>
-              <div className="hero-profit-line">
-                <i style={{ left: "6%", bottom: "22%" }} />
-                <i style={{ left: "22%", bottom: "31%" }} />
-                <i style={{ left: "39%", bottom: "27%" }} />
-                <i style={{ left: "55%", bottom: "43%" }} />
-                <i style={{ left: "72%", bottom: "38%" }} />
-                <i style={{ left: "90%", bottom: "53%" }} />
+
+              <div className="hero-chart-stage">
+                <div className="hero-bars hero-bars-v2">
+                  {[44, 59, 52, 68, 63, 78, 72, 88, 81, 95, 86, 100].map(
+                    (height, index) => (
+                      <span key={index} style={{ height: `${height}%` }} />
+                    ),
+                  )}
+                </div>
+
+                <svg
+                  className="hero-profit-svg"
+                  viewBox="0 0 1000 220"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <linearGradient id="profitArea" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#27A56E" stopOpacity="0.18" />
+                      <stop offset="100%" stopColor="#27A56E" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M20 170 C100 158 120 164 190 145 S290 150 360 120 S465 128 535 92 S650 105 715 74 S825 87 900 54 S955 60 980 44 L980 220 L20 220 Z"
+                    fill="url(#profitArea)"
+                  />
+                  <path
+                    d="M20 170 C100 158 120 164 190 145 S290 150 360 120 S465 128 535 92 S650 105 715 74 S825 87 900 54 S955 60 980 44"
+                    fill="none"
+                    stroke="#27A56E"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                  />
+                  {[
+                    [20, 170], [190, 145], [360, 120], [535, 92],
+                    [715, 74], [900, 54], [980, 44],
+                  ].map(([cx, cy], index) => (
+                    <circle key={index} cx={cx} cy={cy} r="6" fill="#FFFFFF" stroke="#27A56E" strokeWidth="4" />
+                  ))}
+                </svg>
+              </div>
+
+              <div className="hero-chart-labels">
+                <span>01</span><span>04</span><span>07</span><span>10</span><span>12</span>
               </div>
             </div>
 
-            <div className="hero-insight">
-              <span>⚡ Insight</span>
-              <strong>TikTok Ads กินกำไร 18.4% ของยอดขายช่องทางนี้</strong>
+            <div className="hero-insight hero-insight-v2">
+              <span className="hero-insight-icon">⚡</span>
+              <div>
+                <span>PROFIT INSIGHT</span>
+                <strong>Ads เป็นค่าใช้จ่ายที่กินกำไรมากที่สุด 18.4%</strong>
+                <small>เริ่มจากเช็ก Campaign ที่ใช้เงินสูงแต่สร้างกำไรต่ำ</small>
+              </div>
             </div>
           </div>
         </section>
@@ -152,12 +211,12 @@ export default function LandingPage() {
 
         <section className="landing-cta">
           <div>
-            <span>POC เปิดให้ลองแล้ว</span>
-            <h2>ลองเป็นเจ้าของร้าน Demo ก่อน</h2>
-            <p>ไม่ต้องสมัครก็ได้ กด Demo แล้วเข้า Dashboard ได้ทันที</p>
+            <span>Early Access • ฟรีช่วงรับ Feedback</span>
+            <h2>ลองใช้เหลือจริงฟรี แล้วช่วยเราทำให้ตรงกับร้านคุณมากขึ้น</h2>
+            <p>ตอนนี้ไม่มีค่าใช้จ่าย เริ่มจาก Demo หรือสมัครบัญชีฟรีเพื่อใช้ข้อมูลร้านของคุณเอง</p>
           </div>
           <Link href="/login?demo=1" className="button primary large">
-            เปิด Demo Account
+            ลอง Demo ฟรี
           </Link>
         </section>
       </main>
@@ -167,11 +226,12 @@ export default function LandingPage() {
           <BrandMark size={32} />
           <div>
             <strong>เหลือจริง</strong>
-            <small>POC v0.7</small>
+            <small>Early v0.7</small>
           </div>
         </div>
         <div>
           <Link href="/terms">Terms & Conditions</Link>
+          <Link href="/cookies">Cookie Policy</Link>
           <Link href="/login">Login</Link>
           <Link href="/register">Register</Link>
         </div>

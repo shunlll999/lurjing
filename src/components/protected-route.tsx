@@ -14,29 +14,59 @@ export function ProtectedRoute({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, ready } = useAuth();
+  const {
+    user,
+    ready,
+    refreshSessionProfile,
+  } = useAuth();
 
   useEffect(() => {
     if (!ready) return;
+
+    const next =
+      pathname || "/dashboard";
 
     if (
       !user ||
       user.status !== "active"
     ) {
-      const next =
-        pathname || "/dashboard";
-
       router.replace(
         `/login?next=${encodeURIComponent(
           next,
         )}`,
       );
+      return;
     }
+
+    let cancelled = false;
+
+    // Performance Mode: one-time status validation on navigation.
+    // No Firestore realtime listener is kept open.
+    void refreshSessionProfile().then(
+      (active) => {
+        if (
+          !active &&
+          !cancelled
+        ) {
+          router.replace(
+            `/login?next=${encodeURIComponent(
+              next,
+            )}`,
+          );
+        }
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     ready,
-    user,
+    user?.id,
+    user?.status,
     pathname,
     router,
+    refreshSessionProfile,
   ]);
 
   if (!ready) {

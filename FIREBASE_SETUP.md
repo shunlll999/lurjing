@@ -77,7 +77,7 @@ Passwords are never stored in Firestore.
 - Demo account automatically uses mock seller data.
 - Real users start with an empty Dashboard.
 - Real users only see data they import themselves.
-- Imported POC seller data is kept in browser localStorage and is namespaced by Firebase UID.
+- Imported Early seller data is kept in browser localStorage and is namespaced by Firebase UID.
 
 ## 5) Build / Firebase Hosting
 
@@ -141,3 +141,31 @@ After updating the project:
 ```bash
 firebase deploy --only firestore:rules
 ```
+
+
+## Shop Profile Image / Firebase Storage
+
+The profile page is already wired for Firebase Storage.
+
+1. Firebase Console → Storage → Get started.
+2. Confirm the Storage bucket shown by Firebase and copy that exact value into:
+
+```env
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=<your Firebase Storage bucket>
+```
+
+3. Deploy the Storage + Firestore rules:
+
+```bash
+firebase deploy --only storage,firestore:rules
+```
+
+Shop images are uploaded to a fixed object path:
+
+```text
+users/{uid}/profile/store-avatar
+```
+
+The file is limited to JPG / PNG / WebP under 5 MB. The resulting download URL and object path are saved to `users/{uid}` as `storeAvatarUrl` and `storeAvatarPath`.
+
+Enabling/configuring Firebase Storage does not depend on the Firestore daily read quota. If Firestore quota is currently exhausted, the image bytes can be uploaded once Storage is enabled, but saving the resulting URL into the profile still needs Firestore to be available.

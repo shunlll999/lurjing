@@ -1,5 +1,6 @@
 import { getFirebaseApp } from "@/lib/firebase";
 import { getTrackingSettings } from "@/lib/product-analytics";
+import { hasAnalyticsConsent } from "@/lib/cookie-consent";
 
 type GaParam =
   | string
@@ -55,6 +56,11 @@ async function getRawGa4() {
 }
 
 async function getEnabledGa4() {
+  // Consent is checked before Firebase Analytics is imported/initialized.
+  if (!hasAnalyticsConsent()) {
+    return null;
+  }
+
   const settings =
     await getTrackingSettings();
 
@@ -70,6 +76,9 @@ async function getEnabledGa4() {
 
 export async function syncGaCollectionSetting() {
   try {
+    // Do not initialize GA4 at all until the visitor has opted in.
+    if (!hasAnalyticsConsent()) return;
+
     const settings =
       await getTrackingSettings(true);
 
@@ -92,6 +101,26 @@ export async function syncGaCollectionSetting() {
   } catch (error) {
     console.warn(
       "[GA4] unable to sync collection setting",
+      error,
+    );
+  }
+}
+
+export async function disableGaCollectionIfLoaded() {
+  try {
+    // If Analytics was never initialized, there is nothing to disable.
+    if (!rawAnalyticsPromise) return;
+
+    const analytics = await rawAnalyticsPromise;
+    if (!analytics) return;
+
+    const { setAnalyticsCollectionEnabled } =
+      await import("firebase/analytics");
+
+    setAnalyticsCollectionEnabled(analytics, false);
+  } catch (error) {
+    console.warn(
+      "[GA4] unable to disable collection",
       error,
     );
   }

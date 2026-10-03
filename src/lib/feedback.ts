@@ -10,7 +10,7 @@ import {
   query,
   updateDoc,
   where,
-} from "firebase/firestore";
+} from "firebase/firestore/lite";
 
 import {
   getFirebaseAuth,
@@ -191,6 +191,46 @@ export async function listMyFeedback(
         firebaseUser.uid,
       ),
       limit(50),
+    ),
+  );
+
+  return sortNewest(
+    snapshot.docs.map(
+      (item) =>
+        ({
+          id: item.id,
+          ...item.data(),
+        }) as FeedbackItem,
+    ),
+  );
+}
+
+
+export async function listPublicFeaturedFeedback(
+  maximum = 6,
+) {
+  const snapshot = await getDocs(
+    query(
+      collection(
+        getFirebaseDb(),
+        COLLECTION,
+      ),
+      where(
+        "moderationStatus",
+        "==",
+        "approved",
+      ),
+      where(
+        "allowPublic",
+        "==",
+        true,
+      ),
+      where(
+        "featured",
+        "==",
+        true,
+      ),
+      limit(Math.max(1, Math.min(maximum, 12))),
     ),
   );
 

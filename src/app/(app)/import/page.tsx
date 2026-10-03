@@ -96,7 +96,7 @@ export default function ImportPage() {
           <p className="eyebrow">IMPORT SALES DATA</p>
           <h2>เอาข้อมูลร้านเข้ามา แล้วดูว่าเหลือกำไรจริงเท่าไร</h2>
           <p className="muted">
-            POC นี้เริ่มจาก CSV ก่อน เพื่อทดสอบว่าการวิเคราะห์กำไรและต้นทุนตอบโจทย์จริง
+            Early นี้เริ่มจาก CSV ก่อน เพื่อทดสอบว่าการวิเคราะห์กำไรและต้นทุนตอบโจทย์จริง
             ก่อนเชื่อม Shopee, TikTok Shop และ Lazada API
           </p>
         </div>
@@ -155,7 +155,7 @@ export default function ImportPage() {
             >
               เลือกไฟล์ CSV
             </button>
-            <small>ไฟล์ถูกอ่านใน browser สำหรับ POC นี้</small>
+            <small>ไฟล์ถูกอ่านใน browser สำหรับ Early นี้</small>
           </div>
 
           {fileName && (
@@ -184,7 +184,7 @@ export default function ImportPage() {
               ดาวน์โหลด CSV ตัวอย่าง
             </a>
             {state.type === "success" && (
-              <Link className="button primary" href="/">
+              <Link className="button primary" href="/dashboard">
                 ดู Dashboard →
               </Link>
             )}
@@ -212,7 +212,7 @@ export default function ImportPage() {
               <b>2</b>
               <div>
                 <strong>แทนข้อมูล Demo ด้วยข้อมูลร้าน</strong>
-                <span>1 แถวสามารถเป็นยอดรวมต่อวัน / SKU สำหรับ POC ได้</span>
+                <span>1 แถวสามารถเป็นยอดรวมต่อวัน / SKU สำหรับ Early ได้</span>
               </div>
             </div>
 
@@ -235,7 +235,7 @@ export default function ImportPage() {
           </div>
 
           <div className="import-tip">
-            <strong>Tip สำหรับ POC</strong>
+            <strong>Tip สำหรับ Early</strong>
             <p>
               ถ้ายังไม่มีต้นทุนบางช่อง เช่น Affiliate หรือ Refund ให้ใส่ <code>0</code> ได้
               แต่อย่าลบชื่อ column ออกจาก CSV

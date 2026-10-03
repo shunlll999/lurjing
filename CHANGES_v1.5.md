@@ -45,7 +45,7 @@ Admin can:
 - delete feedback
 
 Real feedback is NOT displayed on the Landing Page yet.
-The Landing Page continues to show clearly labeled POC demo testimonials only.
+The Landing Page continues to show clearly labeled Early demo testimonials only.
 
 ## Firestore Rules
 Rules were updated for:
@@ -54,7 +54,7 @@ Rules were updated for:
 - analytics_events
 - settings
 
-The POC admin email in the rules is:
+The Early admin email in the rules is:
 - `admin@lurjing.com`
 
 If the Admin email changes later, update the `isAdmin()` rule too.

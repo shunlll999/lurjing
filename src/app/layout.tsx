@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import { SellerDataProvider } from "@/components/seller-data-provider";
 import { AuthProvider } from "@/components/auth-provider";
 import { AnalyticsProvider } from "@/components/analytics-provider";
+import { CookieConsent } from "@/components/cookie-consent";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lurjing.com";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
           <AnalyticsProvider>
             <SellerDataProvider>{children}</SellerDataProvider>
           </AnalyticsProvider>
+          <CookieConsent />
         </AuthProvider>
       </body>
     </html>

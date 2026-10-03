@@ -9,6 +9,10 @@ export interface UserProfile {
   storeName: string;
   phone?: string;
 
+  /** Optional shop avatar stored in Firebase Storage. */
+  storeAvatarUrl?: string;
+  storeAvatarPath?: string;
+
   plan: "Demo" | "Free" | "Admin";
   role: UserRole;
   status: UserStatus;
@@ -25,7 +29,7 @@ export interface UserProfile {
 }
 
 /**
- * Local mirror used only by the existing POC Admin UI.
+ * Local mirror used only by the existing Early Admin UI.
  * Passwords are never stored here.
  */
 export interface StoredAccount extends UserProfile {

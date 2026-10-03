@@ -3,7 +3,8 @@ export type ImportantEventName =
   | "user_login"
   | "profile_updated"
   | "csv_imported"
-  | "feedback_submitted";
+  | "feedback_submitted"
+  | "ai_insight_requested";
 
 export interface TrackingSettings {
   enabled: boolean;

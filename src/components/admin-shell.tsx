@@ -10,7 +10,7 @@ const items = [
   { href: "/admin/users", label: "Users" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/feedback", label: "Feedback" },
-  { href: "/admin/settings", label: "POC Settings" },
+  { href: "/admin/settings", label: "Early Settings" },
 ] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -30,7 +30,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <BrandMark size={38} />
           <div>
             <strong>เหลือจริง Admin</strong>
-            <small>POC Control Center</small>
+            <small>Early Control Center</small>
           </div>
         </Link>
 
@@ -66,10 +66,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <main className="admin-content">
         <header className="admin-topbar">
           <div>
-            <p className="eyebrow">POC ADMIN</p>
+            <p className="eyebrow">Early ADMIN</p>
             <h1>Control Center</h1>
           </div>
-          <span className="admin-environment">LOCAL POC</span>
+          <span className="admin-environment">LOCAL Early</span>
         </header>
         {children}
       </main>

@@ -31,7 +31,7 @@ export function AuthLayout({
         </section>
 
         <p className="auth-footnote">
-          POC สำหรับทดลอง Product Experience • ข้อมูลบัญชีที่สมัครเก็บอยู่ใน browser นี้
+          Early สำหรับทดลอง Product Experience • ข้อมูลบัญชีที่สมัครเก็บอยู่ใน browser นี้
         </p>
       </div>
     </div>

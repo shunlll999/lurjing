@@ -6,14 +6,16 @@ import {
   type FirebaseOptions,
 } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 import {
   getFirestore,
   type Firestore,
-} from "firebase/firestore";
+} from "firebase/firestore/lite";
 
 let appInstance: FirebaseApp | null = null;
 let authInstance: Auth | null = null;
 let firestoreInstance: Firestore | null = null;
+let storageInstance: FirebaseStorage | null = null;
 
 function cleanEnv(value?: string) {
   return value
@@ -98,4 +100,21 @@ export function getFirebaseDb(): Firestore {
 
   firestoreInstance = getFirestore(getFirebaseApp());
   return firestoreInstance;
+}
+
+export function getFirebaseStorage(): FirebaseStorage {
+  if (storageInstance) return storageInstance;
+
+  const bucket = cleanEnv(
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  );
+
+  if (!bucket) {
+    throw new Error(
+      "Firebase Storage config missing: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
+    );
+  }
+
+  storageInstance = getStorage(getFirebaseApp());
+  return storageInstance;
 }

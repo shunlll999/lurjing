@@ -4,7 +4,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-} from "firebase/firestore";
+} from "firebase/firestore/lite";
 
 import {
   ADMIN_EMAIL,
@@ -151,7 +151,7 @@ export async function createUserProfile(
   };
 
   console.info(
-    "[Firestore] create users/%s",
+    "[Firestore Lite] create users/%s",
     firebaseUser.uid,
   );
 
@@ -161,29 +161,19 @@ export async function createUserProfile(
   );
 
   console.info(
-    "[Firestore] created users/%s",
+    "[Firestore Lite] created users/%s",
     firebaseUser.uid,
   );
 
   return profile;
 }
 
-export async function getUserProfile(
+function mergeStoredProfile(
   firebaseUser: FirebaseUser,
-): Promise<UserProfile> {
+  stored: UserProfile,
+): UserProfile {
   const fallback =
     buildFallbackProfile(firebaseUser);
-
-  const snapshot = await getDoc(
-    userDoc(firebaseUser.uid),
-  );
-
-  if (!snapshot.exists()) {
-    return fallback;
-  }
-
-  const stored =
-    snapshot.data() as UserProfile;
 
   const admin =
     isAdminEmail(firebaseUser.email);
@@ -200,7 +190,7 @@ export async function getUserProfile(
       firebaseUser.email ??
       stored.email,
 
-    // POC role mapping is always derived from the configured admin email.
+    // Early role mapping remains derived from the configured admin email.
     role: admin ? "admin" : "user",
 
     plan: admin
@@ -222,6 +212,25 @@ export async function getUserProfile(
   };
 }
 
+export async function getUserProfile(
+  firebaseUser: FirebaseUser,
+): Promise<UserProfile> {
+  const snapshot = await getDoc(
+    userDoc(firebaseUser.uid),
+  );
+
+  if (!snapshot.exists()) {
+    return buildFallbackProfile(
+      firebaseUser,
+    );
+  }
+
+  return mergeStoredProfile(
+    firebaseUser,
+    snapshot.data() as UserProfile,
+  );
+}
+
 /**
  * Existing Firebase Auth accounts created before Firestore integration
  * get a Firestore document the next time they log in.
@@ -233,19 +242,37 @@ export async function ensureUserProfile(
   const snapshot = await getDoc(ref);
 
   if (snapshot.exists()) {
-    return getUserProfile(firebaseUser);
+    console.info(
+      "[Firestore Lite] users/%s already exists",
+      firebaseUser.uid,
+    );
+
+    return mergeStoredProfile(
+      firebaseUser,
+      snapshot.data() as UserProfile,
+    );
   }
 
   const fallback =
     buildFallbackProfile(firebaseUser);
 
   // Admin UI role remains email-derived and does not need a client-created
-  // Firestore document for this static POC.
+  // Firestore document for this static Early.
   if (fallback.role === "admin") {
     return fallback;
   }
 
+  console.info(
+    "[Firestore Lite] users/%s missing — creating fallback profile",
+    firebaseUser.uid,
+  );
+
   await setDoc(ref, fallback);
+
+  console.info(
+    "[Firestore Lite] users/%s fallback profile created",
+    firebaseUser.uid,
+  );
 
   return fallback;
 }
@@ -253,10 +280,11 @@ export async function ensureUserProfile(
 export async function touchUserLogin(
   firebaseUser: FirebaseUser,
 ) {
-  const profile =
-    await ensureUserProfile(firebaseUser);
+  // The caller already ensured the profile exists. Avoid a second read here.
+  const fallback =
+    buildFallbackProfile(firebaseUser);
 
-  if (profile.role === "admin") {
+  if (fallback.role === "admin") {
     return;
   }
 
@@ -281,6 +309,8 @@ export async function updateOwnUserProfile(
     displayName?: string;
     storeName?: string;
     phone?: string;
+    storeAvatarUrl?: string;
+    storeAvatarPath?: string;
   },
 ) {
   const payload = {
@@ -302,6 +332,20 @@ export async function updateOwnUserProfile(
       ? {
           phone:
             updates.phone.trim(),
+        }
+      : {}),
+
+    ...(updates.storeAvatarUrl !== undefined
+      ? {
+          storeAvatarUrl:
+            updates.storeAvatarUrl.trim(),
+        }
+      : {}),
+
+    ...(updates.storeAvatarPath !== undefined
+      ? {
+          storeAvatarPath:
+            updates.storeAvatarPath.trim(),
         }
       : {}),
 

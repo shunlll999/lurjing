@@ -8,9 +8,10 @@ import {
   orderBy,
   query,
   setDoc,
-} from "firebase/firestore";
+} from "firebase/firestore/lite";
 
 import { getFirebaseDb } from "@/lib/firebase";
+import { hasAnalyticsConsent } from "@/lib/cookie-consent";
 import type {
   AnalyticsEventItem,
   ImportantEventName,
@@ -34,6 +35,8 @@ let settingsCache: {
   loadedAt: number;
 } | null = null;
 
+let settingsRequest: Promise<TrackingSettings> | null = null;
+
 function browserPath() {
   if (typeof window === "undefined") return "";
   return window.location.pathname;
@@ -50,36 +53,56 @@ export async function getTrackingSettings(
     return settingsCache.value;
   }
 
-  try {
-    const snapshot = await getDoc(
-      doc(
-        getFirebaseDb(),
-        SETTINGS_COLLECTION,
-        SETTINGS_DOC,
-      ),
-    );
-
-    const value = snapshot.exists()
-      ? {
-          ...DEFAULT_SETTINGS,
-          ...(snapshot.data() as Partial<TrackingSettings>),
-        }
-      : DEFAULT_SETTINGS;
-
-    settingsCache = {
-      value,
-      loadedAt: Date.now(),
-    };
-
-    return value;
-  } catch (error) {
-    console.warn(
-      "[Analytics] unable to read tracking settings; using defaults",
-      error,
-    );
-
-    return DEFAULT_SETTINGS;
+  // Share one Firestore read between events that arrive at the same time.
+  // This is especially useful during initial app boot, where route_view,
+  // identifyGaUser, and GA4 setup can run almost together.
+  if (settingsRequest) {
+    return settingsRequest;
   }
+
+  settingsRequest = (async () => {
+    try {
+      const snapshot = await getDoc(
+        doc(
+          getFirebaseDb(),
+          SETTINGS_COLLECTION,
+          SETTINGS_DOC,
+        ),
+      );
+
+      const value = snapshot.exists()
+        ? {
+            ...DEFAULT_SETTINGS,
+            ...(snapshot.data() as Partial<TrackingSettings>),
+          }
+        : DEFAULT_SETTINGS;
+
+      settingsCache = {
+        value,
+        loadedAt: Date.now(),
+      };
+
+      return value;
+    } catch (error) {
+      console.warn(
+        "[Analytics] unable to read tracking settings; using cached defaults",
+        error,
+      );
+
+      // Cache the fallback too. If Firestore is temporarily unavailable or
+      // quota is exhausted, clicks/events must not retry this read repeatedly.
+      settingsCache = {
+        value: DEFAULT_SETTINGS,
+        loadedAt: Date.now(),
+      };
+
+      return DEFAULT_SETTINGS;
+    } finally {
+      settingsRequest = null;
+    }
+  })();
+
+  return settingsRequest;
 }
 
 export async function saveTrackingSettings(
@@ -119,6 +142,7 @@ export async function trackImportantEvent(
   > = {},
 ) {
   if (!user || user.role === "admin") return;
+  if (!hasAnalyticsConsent()) return;
 
   const settings = await getTrackingSettings();
 

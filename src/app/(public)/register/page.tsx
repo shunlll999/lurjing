@@ -55,7 +55,7 @@ export default function RegisterPage() {
   return (
     <AuthLayout
       title="เริ่มดู “กำไรจริง” ของร้าน"
-      subtitle="สร้างบัญชี POC แล้วนำเข้าข้อมูลร้านได้ทันที"
+      subtitle="Early Access ฟรีช่วงรับ Feedback — สร้างบัญชีแล้วนำเข้าข้อมูลร้านได้ทันที ไม่มีค่าใช้จ่ายตอนนี้"
     >
       <form className="auth-form" onSubmit={onSubmit}>
         <div className="auth-form-row">

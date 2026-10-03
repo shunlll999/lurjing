@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { StarRating } from "@/components/star-rating";
 import {
@@ -14,47 +9,29 @@ import {
   removeFeedback,
   setFeedbackFeatured,
 } from "@/lib/feedback";
-import type {
-  FeedbackItem,
-  FeedbackModerationStatus,
-} from "@/types/feedback";
+import type { FeedbackItem, FeedbackModerationStatus } from "@/types/feedback";
 
-type FilterKey =
-  | "all"
-  | FeedbackModerationStatus
-  | "featured";
+type FilterKey = "all" | FeedbackModerationStatus | "featured";
 
 export default function AdminFeedbackPage() {
-  const [items, setItems] =
-    useState<FeedbackItem[]>([]);
-  const [filter, setFilter] =
-    useState<FilterKey>("all");
-  const [loading, setLoading] =
-    useState(true);
-  const [error, setError] =
-    useState("");
+  const [items, setItems] = useState<FeedbackItem[]>([]);
+  const [filter, setFilter] = useState<FilterKey>("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const reload =
-    useCallback(async () => {
-      setLoading(true);
-      setError("");
+  const reload = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-      try {
-        setItems(
-          await listAdminFeedback(),
-        );
-      } catch (loadError) {
-        console.error(
-          "[Admin Feedback] load failed",
-          loadError,
-        );
-        setError(
-          "โหลด Feedback จาก Firestore ไม่สำเร็จ",
-        );
-      } finally {
-        setLoading(false);
-      }
-    }, []);
+    try {
+      setItems(await listAdminFeedback());
+    } catch (loadError) {
+      console.error("[Admin Feedback] load failed", loadError);
+      setError("โหลด Feedback จาก Firestore ไม่สำเร็จ");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     void reload();
@@ -66,49 +43,27 @@ export default function AdminFeedbackPage() {
     }
 
     if (filter === "featured") {
-      return items.filter(
-        (item) => item.featured,
-      );
+      return items.filter((item) => item.featured);
     }
 
-    return items.filter(
-      (item) =>
-        item.moderationStatus ===
-        filter,
-    );
+    return items.filter((item) => item.moderationStatus === filter);
   }, [items, filter]);
 
   const moderate = async (
     item: FeedbackItem,
-    moderationStatus:
-      FeedbackModerationStatus,
+    moderationStatus: FeedbackModerationStatus,
   ) => {
-    await moderateFeedback(
-      item.id,
-      moderationStatus,
-      item.featured,
-    );
+    await moderateFeedback(item.id, moderationStatus, item.featured);
     await reload();
   };
 
-  const toggleFeatured = async (
-    item: FeedbackItem,
-  ) => {
-    await setFeedbackFeatured(
-      item,
-      !item.featured,
-    );
+  const toggleFeatured = async (item: FeedbackItem) => {
+    await setFeedbackFeatured(item, !item.featured);
     await reload();
   };
 
-  const remove = async (
-    item: FeedbackItem,
-  ) => {
-    if (
-      !window.confirm(
-        `ลบ Feedback จาก ${item.displayName} หรือไม่?`,
-      )
-    ) {
+  const remove = async (item: FeedbackItem) => {
+    if (!window.confirm(`ลบ Feedback จาก ${item.displayName} หรือไม่?`)) {
       return;
     }
 
@@ -121,26 +76,15 @@ export default function AdminFeedbackPage() {
       <section className="admin-card">
         <div className="admin-card-head">
           <div>
-            <p className="eyebrow">
-              FEEDBACK MODERATION
-            </p>
-            <h2>
-              Feedback ทั้งหมด
-            </h2>
+            <p className="eyebrow">FEEDBACK MODERATION</p>
+            <h2>Feedback ทั้งหมด</h2>
             <p>
-              ข้อมูลจริงจาก Firestore
-              สำหรับ Admin เท่านั้น
-              ตอนนี้ยังไม่แสดง Feedback
-              จริงบน Landing Page
+              ข้อมูลจริงจาก Firestore — Feedback ที่ผู้ใช้อนุญาตและ Admin กด
+              Mark Featured จะแสดงบน Landing Page อัตโนมัติเมื่อหน้าเว็บโหลดครั้งถัดไป
             </p>
           </div>
 
-          <button
-            className="button secondary"
-            onClick={() =>
-              void reload()
-            }
-          >
+          <button className="button secondary" onClick={() => void reload()}>
             Refresh
           </button>
         </div>
@@ -155,110 +99,63 @@ export default function AdminFeedbackPage() {
           ].map(([key, label]) => (
             <button
               key={key}
-              className={
-                filter === key
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setFilter(
-                  key as FilterKey,
-                )
-              }
+              className={filter === key ? "active" : ""}
+              onClick={() => setFilter(key as FilterKey)}
             >
               {label}
             </button>
           ))}
         </div>
 
-        {error && (
-          <div className="auth-error">
-            {error}
-          </div>
-        )}
+        {error && <div className="auth-error">{error}</div>}
 
         <div className="admin-feedback-list">
           {loading ? (
-            <div className="admin-empty">
-              กำลังโหลด Feedback...
-            </div>
+            <div className="admin-empty">กำลังโหลด Feedback...</div>
           ) : (
             visible.map((item) => (
-              <article
-                className="admin-feedback-card"
-                key={item.id}
-              >
+              <article className="admin-feedback-card" key={item.id}>
                 <div className="admin-feedback-meta">
                   <div className="admin-feedback-user">
-                    <span>
-                      {item.displayName.slice(
-                        0,
-                        1,
-                      )}
-                    </span>
+                    <span>{item.displayName.slice(0, 1)}</span>
                     <div>
-                      <strong>
-                        {item.displayName}
-                      </strong>
-                      <small>
-                        {item.storeName}
-                      </small>
+                      <strong>{item.displayName}</strong>
+                      <small>{item.storeName}</small>
                     </div>
                   </div>
 
                   <div className="admin-feedback-rating">
-                    <StarRating
-                      value={item.rating}
-                      readonly
-                      size="sm"
-                    />
-                    <span>
-                      {item.rating}.0
-                    </span>
+                    <StarRating value={item.rating} readonly size="sm" />
+                    <span>{item.rating}.0</span>
                   </div>
                 </div>
 
-                <p className="admin-feedback-message">
-                  {item.message}
-                </p>
+                <p className="admin-feedback-message">{item.message}</p>
 
                 <div className="admin-feedback-flags">
-                  <span
-                    className={`admin-status ${item.moderationStatus}`}
-                  >
-                    {
-                      item.moderationStatus
-                    }
+                  <span className={`admin-status ${item.moderationStatus}`}>
+                    {item.moderationStatus}
                   </span>
 
                   <span
                     className={
-                      item.allowPublic
-                        ? "public-flag"
-                        : "private-flag"
+                      item.allowPublic ? "public-flag" : "private-flag"
                     }
                   >
                     {item.allowPublic
-                      ? "Future testimonial consent"
+                      ? "อนุญาตให้เผยแพร่"
                       : "Private"}
                   </span>
 
                   {item.featured && (
-                    <span className="featured-flag">
-                      FEATURED
-                    </span>
+                    <span className="featured-flag">FEATURED</span>
                   )}
                 </div>
 
                 <div className="admin-feedback-actions">
                   <button
                     className="admin-mini-button success"
-                    onClick={() =>
-                      void moderate(
-                        item,
-                        "approved",
-                      )
-                    }
+                    onClick={() => void moderate(item, "approved")}
                   >
                     Approve
                   </button>
@@ -269,42 +166,27 @@ export default function AdminFeedbackPage() {
                         ? "admin-mini-button featured"
                         : "admin-mini-button"
                     }
-                    disabled={
-                      !item.allowPublic
-                    }
+                    disabled={!item.allowPublic}
                     title={
                       item.allowPublic
                         ? ""
                         : "ผู้ใช้ไม่ได้อนุญาตให้นำ Feedback ไปใช้เป็น Testimonial"
                     }
-                    onClick={() =>
-                      void toggleFeatured(
-                        item,
-                      )
-                    }
+                    onClick={() => void toggleFeatured(item)}
                   >
-                    {item.featured
-                      ? "Unfeature"
-                      : "Mark Featured"}
+                    {item.featured ? "ซ่อนจาก Landing" : "แสดงบน Landing"}
                   </button>
 
                   <button
                     className="admin-mini-button"
-                    onClick={() =>
-                      void moderate(
-                        item,
-                        "rejected",
-                      )
-                    }
+                    onClick={() => void moderate(item, "rejected")}
                   >
                     Reject
                   </button>
 
                   <button
                     className="admin-mini-button danger"
-                    onClick={() =>
-                      void remove(item)
-                    }
+                    onClick={() => void remove(item)}
                   >
                     Delete
                   </button>
@@ -313,13 +195,9 @@ export default function AdminFeedbackPage() {
             ))
           )}
 
-          {!loading &&
-            visible.length === 0 && (
-              <div className="admin-empty">
-                ไม่มี Feedback
-                ในสถานะนี้
-              </div>
-            )}
+          {!loading && visible.length === 0 && (
+            <div className="admin-empty">ไม่มี Feedback ในสถานะนี้</div>
+          )}
         </div>
       </section>
     </div>

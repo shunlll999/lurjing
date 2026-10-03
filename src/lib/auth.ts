@@ -26,7 +26,7 @@ function normalizeAccount(
 }
 
 /**
- * POC Admin mirror only.
+ * Early Admin mirror only.
  * Firebase Authentication + Firestore are the actual source of truth.
  */
 export function readAccounts(): StoredAccount[] {

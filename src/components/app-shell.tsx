@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSellerData } from "@/components/seller-data-provider";
 import { useAuth } from "@/components/auth-provider";
 import { BrandMark } from "@/components/brand-logo";
+import { StoreAvatar } from "@/components/store-avatar";
 
 const items = [
   { href: "/dashboard", label: "ภาพรวม" },
@@ -52,9 +53,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="sidebar-footer">
           <Link href="/profile" className="account-card">
-            <span className="account-avatar">
-              {(user?.displayName || "U").slice(0, 1).toUpperCase()}
-            </span>
+            <StoreAvatar
+              className="account-avatar"
+              src={user?.storeAvatarUrl}
+              name={user?.storeName || user?.displayName || "ร้าน"}
+            />
             <span className="account-copy">
               <strong>{user?.displayName}</strong>
               <small>{user?.storeName}</small>
@@ -80,7 +83,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="topbar-actions">
             <Link href="/profile" className="profile-pill">
-              <span>{(user?.displayName || "U").slice(0, 1).toUpperCase()}</span>
+              <StoreAvatar
+                className="profile-pill-avatar"
+                src={user?.storeAvatarUrl}
+                name={user?.storeName || user?.displayName || "ร้าน"}
+              />
               <div>
                 <strong>{user?.displayName}</strong>
                 <small>{user?.storeName}</small>

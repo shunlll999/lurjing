@@ -8,10 +8,15 @@ import { usePathname } from "next/navigation";
 
 import { useAuth } from "@/components/auth-provider";
 import {
+  disableGaCollectionIfLoaded,
   identifyGaUser,
   syncGaCollectionSetting,
   trackGaEvent,
 } from "@/lib/ga4";
+import {
+  hasAnalyticsConsent,
+  subscribeCookieConsent,
+} from "@/lib/cookie-consent";
 
 function destinationPath(
   element: Element,
@@ -41,7 +46,25 @@ export function AnalyticsProvider({
     useRef<string | null>(null);
 
   useEffect(() => {
-    void syncGaCollectionSetting();
+    if (hasAnalyticsConsent()) {
+      void syncGaCollectionSetting();
+    }
+
+    return subscribeCookieConsent((consent) => {
+      if (consent.analytics) {
+        void syncGaCollectionSetting();
+
+        // Track the current page after the user opts in without waiting
+        // for another navigation.
+        void trackGaEvent("route_view", {
+          page_path: window.location.pathname,
+          page_title: document.title,
+          consent_update: true,
+        });
+      } else {
+        void disableGaCollectionIfLoaded();
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -114,6 +137,9 @@ export function AnalyticsProvider({
         );
 
       if (!interactive) return;
+
+      // Consent controls must never be logged as analytics interactions.
+      if (interactive.closest("[data-cookie-control]")) return;
 
       const trackId =
         interactive.getAttribute(

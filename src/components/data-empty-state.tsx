@@ -44,10 +44,6 @@ export function DataEmptyState({
             ทดลอง Promotion Simulator
           </Link>
         </div>
-
-        <small>
-          Demo account เท่านั้นที่แสดงข้อมูลตัวอย่างอัตโนมัติ
-        </small>
       </div>
     </section>
   );

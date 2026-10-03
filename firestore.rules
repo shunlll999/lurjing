@@ -30,7 +30,8 @@ service cloud.firestore {
         )
         && request.resource.data.status == "active";
 
-      allow update: if isOwner()
+      allow update: if (
+        isOwner()
         && request.resource.data.id == resource.data.id
         && request.resource.data.email == resource.data.email
         && request.resource.data.role == resource.data.role
@@ -43,12 +44,30 @@ service cloud.firestore {
             "displayName",
             "storeName",
             "phone",
+            "storeAvatarUrl",
+            "storeAvatarPath",
             "updatedAt",
             "lastLoginAt",
             "emailVerified",
             "providerId",
             "termsAcceptedAt"
-          ]);
+          ])
+      ) || (
+        isAdmin()
+        && resource.data.email != "admin@lurjing.com"
+        && resource.data.email != "demo@lurjing.com"
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.plan == resource.data.plan
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            "status",
+            "updatedAt"
+          ])
+      );
 
       allow delete: if false;
     }
@@ -65,6 +84,11 @@ service cloud.firestore {
         || (
           signedIn()
           && resource.data.userId == request.auth.uid
+        )
+        || (
+          resource.data.moderationStatus == "approved"
+          && resource.data.allowPublic == true
+          && resource.data.featured == true
         );
 
       allow update, delete: if isAdmin();

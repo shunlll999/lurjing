@@ -17,11 +17,11 @@ import type { TrackingSettings } from "@/types/analytics";
 const settingsKey =
   "lurjing:admin-settings";
 
-interface POCSettings {
+interface EarlySettings {
   demoAccountEnabled: boolean;
 }
 
-const defaults: POCSettings = {
+const defaults: EarlySettings = {
   demoAccountEnabled: true,
 };
 
@@ -35,7 +35,7 @@ export default function AdminSettingsPage() {
   const { user } = useAuth();
 
   const [settings, setSettings] =
-    useState<POCSettings>(defaults);
+    useState<EarlySettings>(defaults);
 
   const [
     tracking,
@@ -138,7 +138,7 @@ export default function AdminSettingsPage() {
   const clearUsers = () => {
     if (
       !window.confirm(
-        "ล้างเฉพาะ POC user mirror ใน browser นี้หรือไม่? Firebase Auth / Firestore จะไม่ถูกลบ",
+        "ล้างเฉพาะ Early user mirror ใน browser นี้หรือไม่? Firebase Auth / Firestore จะไม่ถูกลบ",
       )
     ) {
       return;
@@ -146,7 +146,7 @@ export default function AdminSettingsPage() {
 
     writeAccounts([]);
     window.alert(
-      "ล้าง POC user mirror แล้ว",
+      "ล้าง Early user mirror แล้ว",
     );
   };
 
@@ -280,7 +280,7 @@ export default function AdminSettingsPage() {
           <div className="admin-card-head">
             <div>
               <p className="eyebrow">
-                POC
+                Early
               </p>
               <h2>
                 Demo settings
@@ -295,7 +295,7 @@ export default function AdminSettingsPage() {
                   Demo Account
                 </strong>
                 <span>
-                  POC setting
+                  Early setting
                   สำหรับทดสอบ UX
                 </span>
               </div>
@@ -331,7 +331,7 @@ export default function AdminSettingsPage() {
           <div className="admin-card-head">
             <div>
               <p className="eyebrow">
-                LOCAL POC
+                LOCAL Early
               </p>
               <h2>
                 Browser mirror

@@ -7,33 +7,34 @@ import {
   useState,
 } from "react";
 
-import { readAccounts } from "@/lib/auth";
+import { listAdminUsers } from "@/lib/admin-users";
 import { listAdminFeedback } from "@/lib/feedback";
 import { listAnalyticsEvents } from "@/lib/product-analytics";
-import type { StoredAccount } from "@/types/auth";
+import type { UserProfile } from "@/types/auth";
 import type { FeedbackItem } from "@/types/feedback";
 import type { AnalyticsEventItem } from "@/types/analytics";
 
 export default function AdminOverviewPage() {
   const [accounts, setAccounts] =
-    useState<StoredAccount[]>([]);
+    useState<UserProfile[]>([]);
   const [feedback, setFeedback] =
     useState<FeedbackItem[]>([]);
   const [events, setEvents] =
     useState<AnalyticsEventItem[]>([]);
 
   useEffect(() => {
-    setAccounts(readAccounts());
-
     void Promise.all([
+      listAdminUsers(),
       listAdminFeedback(100),
       listAnalyticsEvents(100),
     ])
       .then(
         ([
+          userItems,
           feedbackItems,
           analyticsItems,
         ]) => {
+          setAccounts(userItems);
           setFeedback(
             feedbackItems,
           );
@@ -51,8 +52,15 @@ export default function AdminOverviewPage() {
   }, []);
 
   const stats = useMemo(() => {
-    const active =
+    const registered =
       accounts.filter(
+        (item) =>
+          item.role !== "admin" &&
+          !item.isDemo,
+      );
+
+    const active =
+      registered.filter(
         (item) =>
           item.status === "active",
       ).length;
@@ -74,6 +82,7 @@ export default function AdminOverviewPage() {
         : 0;
 
     return {
+      registered: registered.length,
       active,
       pending,
       average,
@@ -88,10 +97,10 @@ export default function AdminOverviewPage() {
             Registered users
           </span>
           <strong>
-            {accounts.length}
+            {stats.registered}
           </strong>
           <small>
-            {stats.active} active
+            {stats.active} active • Firestore
           </small>
         </article>
 
@@ -193,7 +202,7 @@ export default function AdminOverviewPage() {
                 QUICK ACTIONS
               </p>
               <h2>
-                จัดการ POC
+                จัดการ Early
               </h2>
             </div>
           </div>

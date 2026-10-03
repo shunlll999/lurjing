@@ -1,12 +1,8 @@
 # เหลือจริง / LurJing
 
-Seller Profit สำหรับร้านค้าออนไลน์ไทย
+Seller Profit Copilot สำหรับร้านค้าออนไลน์ไทย
 
 **Primary domain:** `lurjing.com`
-
-<img width="538" height="376" alt="Screenshot 2569-09-29 at 18 54 49" src="https://github.com/user-attachments/assets/0c4e5117-d946-42bb-b55c-6c4145a9ecdd" />
-<img width="1115" height="554" alt="Screenshot 2569-09-29 at 18 56 16" src="https://github.com/user-attachments/assets/d4724ca7-7b83-440e-9c96-945a920082d4" />
-
 
 ## Stack
 
@@ -15,7 +11,7 @@ Seller Profit สำหรับร้านค้าออนไลน์ไท
 - TypeScript
 - App Router
 - CSS (ไม่มี UI library dependency)
-- LocalStorage สำหรับ POC data
+- LocalStorage สำหรับ Early data
 
 ## Run
 
@@ -45,7 +41,7 @@ npm start
 - `/costs` — Platform Cost Breakdown
 - `/products` — Product Profitability
 - `/simulator` — Promotion Simulator
-- `/ai-owner` — AI Owner POC
+- `/ai-owner` — AI Owner Early
 - `/import` — CSV Import
 
 ## CSV schema
@@ -70,14 +66,14 @@ date,channel,sku,product,qty,revenue,cogs,commission,payment_fee,service_fee,aff
 
 ## Dashboard charts
 
-หน้า `/` มีกราฟสำหรับ POC แล้ว:
+หน้า `/` มีกราฟสำหรับ Early แล้ว:
 
 - Daily Revenue vs Real Profit
 - Platform Cost Ratio แยก Platform fee / Ads / Affiliate / Discount + Refund
 
-กราฟทำด้วย React + SVG/CSS โดยไม่เพิ่ม chart library เพื่อให้ POC เบาและแก้ต่อได้ง่าย
+กราฟทำด้วย React + SVG/CSS โดยไม่เพิ่ม chart library เพื่อให้ Early เบาและแก้ต่อได้ง่าย
 
-## POC v0.5 UX update
+## Early v0.5 UX update
 
 - Simulator: scenario presets, per-order money flow, break-even price, target 15% margin, projected impact by order volume
 - Import: custom drag/drop upload UI, hidden native file input, schema guide, clear success/error states, responsive layout
@@ -114,16 +110,16 @@ Protected:
 ### Demo account
 
 - Email: `demo@lurjing.com`
-- Password: `demo123`
+- Password: `demo1234`
 
-> Demo/Auth ในเวอร์ชัน POC ใช้ browser localStorage และ Web Crypto SHA-256 สำหรับบัญชีที่ผู้ใช้สมัครเอง ไม่ใช่ production authentication.
+> Demo/Auth ในเวอร์ชัน Early ใช้ browser localStorage และ Web Crypto SHA-256 สำหรับบัญชีที่ผู้ใช้สมัครเอง ไม่ใช่ production authentication.
 
-## POC v0.8
+## Early v0.8
 
 - Landing page: เพิ่ม Testimonial section สำหรับ Social Proof mockup (ระบุชัดว่าเป็นข้อความจำลอง)
 - Promotion Simulator: เพิ่ม Product name + SKU และแสดงชื่อสินค้าในผลลัพธ์/Scale impact
 
-## POC v0.9
+## Early v0.9
 
 - Desktop sidebar เปลี่ยนเป็น fixed เต็มความสูงของ viewport
 - Main content มี offset 250px เพื่อไม่ซ้อนกับ sidebar
@@ -144,7 +140,7 @@ Protected:
 - `/admin` Overview
 - `/admin/users` User management
 - `/admin/feedback` Approve / Reject / Feature testimonial
-- `/admin/settings` POC settings + reset controls
+- `/admin/settings` Early settings + reset controls
 
 Admin account:
 - Email: `admin@lurjing.com`
@@ -200,7 +196,7 @@ Visual direction:
   - `output: "export"`
   - `trailingSlash: true`
   - `images.unoptimized: true`
-  - ปิด `typedRoutes` เพื่อไม่ให้ POC ติดปัญหา dynamic router type
+  - ปิด `typedRoutes` เพื่อไม่ให้ Early ติดปัญหา dynamic router type
 - `firebase.json`
   - deploy จากโฟลเดอร์ `out`
 - `package.json`
@@ -224,3 +220,65 @@ firebase deploy --only hosting
 ```
 
 ไฟล์ `.firebaserc` ใช้ placeholder `YOUR_FIREBASE_PROJECT_ID` ให้เปลี่ยนหรือใช้ `firebase use --add` ก่อน deploy
+
+## Firebase Auth + Firestore Profile + Real User Empty State v1.4
+
+- Email/Password Register + Login through Firebase Authentication
+- `users/{uid}` Firestore profile created on Register
+- User can edit display name, store name, and phone from Profile
+- Demo account uses mock seller data automatically
+- Real users start with an empty Dashboard
+- Real user imported seller data is namespaced by Firebase UID in browser storage
+- Firestore Rules prevent normal users from changing role / plan / status / email
+- Static export + Firebase Hosting remains enabled
+
+
+## Product Analytics + Firestore Feedback v1.5
+
+- GA4: route_view + ui_click
+- Firestore important events: register, login, profile update, CSV import, feedback
+- Admin analytics page: `/admin/analytics`
+- Admin tracking switches: `/admin/settings`
+- Feedback stored in Firestore
+- Feedback visible to Admin
+- Real feedback is not rendered on Landing Page yet
+- Admin activity is excluded from analytics
+
+## AI Owner Beta v1.6
+
+- Rule-based Owner Copilot using the existing LurJing calculation engine.
+- No LLM/API cost in this validation phase.
+- Five suggested business questions based only on imported seller data.
+- `ai_insight_requested` is stored as an Important Event so Admin can measure actual feature demand.
+- See `AI_OWNER_BETA_v1.6.md`.
+
+## Firestore Admin Users v1.7
+
+- `/admin/users` reads real profiles from Firestore `users/{uid}`.
+- Admin Overview user counts also come from Firestore.
+- Admin can Activate / Deactivate normal app users.
+- Deactivate updates `users/{uid}.status`; normal users are signed out in real time through a Firestore profile listener.
+- Demo/Admin system accounts are protected in the Admin UI.
+- Firebase Authentication deletion is intentionally not exposed from the browser; use Firebase Admin SDK / Cloud Functions for that later.
+
+## v1.7.1 — Firestore Lite Performance Mode
+
+The app now uses `firebase/firestore/lite` and no longer keeps Firestore realtime listeners open. Admin data is fetched one time on page load or manual Refresh. Normal users are checked with a throttled one-time status read when navigating protected routes.
+
+## Cookie Consent / PDPA
+
+- Global cookie consent banner with Necessary-only / Analytics consent.
+- Consent is stored as a first-party cookie for 180 days; no localStorage is used for consent.
+- Firebase/Google Analytics is not initialized until Analytics consent is granted.
+- Firestore analytics events are skipped unless Analytics consent is granted.
+- Users can reopen settings from the persistent “คุกกี้” badge.
+- Public policy page: `/cookies`.
+
+
+## Hero + Shop Profile Image
+
+- Landing hero now highlights Early Access as FREE during the feedback period.
+- Hero product preview uses a richer revenue / true-profit / margin chart.
+- Registered users can upload a shop profile image from `/profile`.
+- Images are stored in Firebase Storage; the URL/path remain in the Firestore user profile.
+- App sidebar/topbar use the uploaded shop avatar when available.
