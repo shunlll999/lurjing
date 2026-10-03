@@ -4,6 +4,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -134,6 +135,10 @@ export async function submitFeedback(
     storeName:
       user.storeName?.trim() ||
       "ร้านของฉัน",
+
+    storeAvatarUrl:
+      user.storeAvatarUrl?.trim() ||
+      "",
 
     rating: Math.max(
       1,
@@ -313,6 +318,41 @@ export async function setFeedbackFeatured(
     );
   }
 
+  // When Admin publishes a testimonial, copy the latest shop avatar
+  // into the feedback document. This keeps the public Landing query
+  // isolated from the private users collection and costs only one
+  // additional profile read at publish time (not on every page load).
+  let storeAvatarUrl =
+    item.storeAvatarUrl?.trim() ||
+    "";
+
+  if (featured) {
+    try {
+      const profileSnapshot = await getDoc(
+        doc(
+          getFirebaseDb(),
+          "users",
+          item.userId,
+        ),
+      );
+
+      if (profileSnapshot.exists()) {
+        const profile =
+          profileSnapshot.data() as Partial<UserProfile>;
+
+        storeAvatarUrl =
+          profile.storeAvatarUrl?.trim() ||
+          "";
+      }
+    } catch (error) {
+      // Avatar enrichment must never block moderation.
+      console.warn(
+        "[Feedback] unable to copy store avatar for Landing testimonial",
+        error,
+      );
+    }
+  }
+
   await updateDoc(
     doc(
       getFirebaseDb(),
@@ -323,6 +363,7 @@ export async function setFeedbackFeatured(
       moderationStatus:
         "approved",
       featured,
+      storeAvatarUrl,
       updatedAt:
         new Date().toISOString(),
     },

@@ -1491,7 +1491,7 @@ video {
   border-radius:22px;
   background:linear-gradient(180deg,rgba(18,36,58,.97),rgba(8,22,37,.98));
   box-shadow:0 36px 100px rgba(0,0,0,.34);
-  transform:perspective(1100px) rotateY(345deg) rotateX(1deg)
+  transform:perspective(1100px) rotateY(-3deg) rotateX(1deg);
 }
 .hero-product-top {
   display:flex;
@@ -5147,4 +5147,435 @@ tbody tr:hover {
   .testimonial-empty-actions .button {
     width: 100%;
   }
+}
+
+
+/* ==========================================================================
+   Hero Profit Preview + Shop Avatar — Early feedback release
+   ========================================================================== */
+
+.store-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  color: #0d4a38;
+  background: linear-gradient(145deg, #ddf4d1, #bdefae);
+  border: 1px solid #c7e9be;
+}
+
+.store-avatar > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.store-avatar > span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 800;
+}
+
+.account-avatar.store-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+
+.profile-pill-avatar.store-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+}
+
+.profile-pill > .profile-pill-avatar {
+  color: #0d4a38;
+  background: linear-gradient(145deg, #ddf4d1, #bdefae);
+  border: 1px solid #c7e9be;
+}
+
+.profile-avatar-large.store-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  font-size: 22px;
+}
+
+.profile-avatar-editor {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid #dfe9db;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fbfdf8, #f5faef);
+}
+
+.profile-avatar-preview.store-avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 24px;
+  font-size: 28px;
+  box-shadow: 0 14px 30px rgba(45, 85, 66, .10);
+}
+
+.profile-avatar-copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.profile-avatar-copy > strong {
+  color: #173a31;
+  font-size: 14px;
+}
+
+.profile-avatar-copy > p {
+  margin: 0;
+  max-width: 520px;
+  color: #74847b;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.profile-avatar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.profile-avatar-message {
+  color: #39785d;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.hero-product-v2 {
+  padding: 22px;
+  border-radius: 28px;
+  transform: perspective(1200px) rotateY(345deg) rotateX(.4deg);
+  background:
+    radial-gradient(circle at 96% 0%, rgba(255, 232, 140, .48), transparent 15rem),
+    radial-gradient(circle at 0% 100%, rgba(148, 226, 186, .16), transparent 17rem),
+    rgba(255, 255, 255, .96);
+  box-shadow:
+    0 35px 90px rgba(44, 76, 61, .13),
+    0 1px 0 rgba(255, 255, 255, .9) inset;
+}
+
+.hero-store-head {
+  color: #173a31;
+}
+
+.hero-store-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.hero-store-avatar {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  overflow: hidden;
+  border-radius: 13px;
+  color: #0d4a38;
+  background: linear-gradient(145deg, #daf3ce, #b7eba8);
+  border: 1px solid #c7e9be;
+  font-weight: 850;
+  box-shadow: 0 7px 18px rgba(45, 101, 71, .10);
+}
+
+.hero-store-avatar-image {
+  background: #eef7ec;
+}
+
+.hero-store-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.hero-store-identity > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.hero-store-identity strong {
+  color: #173a31;
+  font-size: 13px;
+}
+
+.hero-store-identity small {
+  color: #7c8b82;
+  font-size: 9px;
+}
+
+.hero-free-badge {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid #bae4ae;
+  border-radius: 999px;
+  color: #1d7a51;
+  background: #eff9e9;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.hero-metrics-v2 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.hero-metrics-v2 > div {
+  min-height: 100px;
+  padding: 14px;
+  border-radius: 17px;
+  background: rgba(250, 252, 248, .92);
+  box-shadow: 0 8px 20px rgba(50, 78, 64, .035);
+}
+
+.hero-metrics-v2 > div.hero-profit-metric {
+  background: linear-gradient(145deg, #edfae7, #f6fced);
+  border-color: #d3ebca;
+}
+
+.hero-metrics-v2 strong {
+  color: #183b31;
+  font-size: clamp(20px, 2vw, 26px);
+  letter-spacing: -.035em;
+}
+
+.hero-metrics-v2 .good {
+  color: #1d9562;
+}
+
+.hero-metrics-v2 small {
+  margin-top: auto;
+  color: #8a978f;
+  font-size: 8.5px;
+}
+
+.hero-metrics-v2 .metric-trend.up {
+  color: #2b9a68;
+  font-weight: 700;
+}
+
+.hero-chart-v2 {
+  height: auto;
+  min-height: 300px;
+  padding: 18px 17px 12px;
+  border-radius: 20px;
+  background:
+    linear-gradient(rgba(220, 230, 216, .48) 1px, transparent 1px),
+    #fbfcf8;
+  background-size: 100% 25%;
+}
+
+.hero-chart-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  z-index: 4;
+  margin-bottom: 14px;
+}
+
+.hero-chart-head > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.hero-chart-head strong {
+  color: #294b40;
+  font-size: 11px;
+}
+
+.hero-chart-head > div:first-child span {
+  color: #89968e;
+  font-size: 8px;
+}
+
+.hero-chart-legend {
+  display: flex;
+  gap: 10px;
+  color: #7f8e85;
+  font-size: 8px;
+}
+
+.hero-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hero-chart-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.legend-sales { background: #a7d3da; }
+.legend-profit { background: #27a56e; }
+
+.hero-chart-stage {
+  position: relative;
+  height: 190px;
+}
+
+.hero-bars-v2 {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  gap: 7px;
+  padding: 0 2px;
+}
+
+.hero-bars-v2 span {
+  opacity: .92;
+  border-radius: 7px 7px 3px 3px;
+  background: linear-gradient(180deg, #8bc9d2, #d8ebef);
+}
+
+.hero-profit-svg {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hero-chart-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 2px 0;
+  color: #9aa69f;
+  font-size: 8px;
+}
+
+.hero-insight-v2 {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 17px;
+  color: #285546;
+  background: linear-gradient(135deg, #eff9e9, #f7fbed);
+}
+
+.hero-insight-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #fff4c7;
+  border: 1px solid #f2e39e;
+  font-size: 15px !important;
+}
+
+.hero-insight-v2 > div {
+  display: grid;
+  gap: 2px;
+}
+
+.hero-insight-v2 > div > span {
+  color: #49896c;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.hero-insight-v2 strong {
+  color: #285546;
+  font-size: 11px;
+}
+
+.hero-insight-v2 small {
+  color: #7a8980;
+  font-size: 8.5px;
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .hero-product-v2 {
+    padding: 15px;
+    border-radius: 22px;
+  }
+
+  .hero-store-identity small {
+    display: none;
+  }
+
+  .hero-metrics-v2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero-metrics-v2 > div:last-child {
+    grid-column: 1 / -1;
+    min-height: 82px;
+  }
+
+  .hero-chart-head {
+    display: grid;
+  }
+
+  .hero-chart-v2 {
+    min-height: 270px;
+  }
+
+  .hero-chart-stage {
+    height: 160px;
+  }
+
+  .profile-avatar-editor {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .profile-avatar-preview.store-avatar {
+    margin: 0 auto;
+  }
+
+  .profile-avatar-actions {
+    justify-content: center;
+  }
+}
+
+
+/* Public testimonial shop avatar */
+.testimonial-avatar {
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.testimonial-avatar.has-image {
+  background: #eff8ea;
+}
+
+.testimonial-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
 }

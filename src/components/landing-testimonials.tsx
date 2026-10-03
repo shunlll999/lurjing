@@ -7,6 +7,35 @@ import { StarRating } from "@/components/star-rating";
 import { listPublicFeaturedFeedback } from "@/lib/feedback";
 import type { FeedbackItem } from "@/types/feedback";
 
+function TestimonialAvatar({ item }: { item: FeedbackItem }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const avatarUrl = item.storeAvatarUrl?.trim();
+  const initial =
+    item.displayName?.trim().slice(0, 1).toUpperCase() ||
+    item.storeName?.trim().slice(0, 1).toUpperCase() ||
+    "L";
+
+  if (avatarUrl && !imageFailed) {
+    return (
+      <div className="testimonial-avatar has-image">
+        <img
+          src={avatarUrl}
+          alt={`รูปโปรไฟล์ร้าน ${item.storeName}`}
+          loading="lazy"
+          decoding="async"
+          onError={() => setImageFailed(true)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="testimonial-avatar" aria-label={`โปรไฟล์ ${item.storeName}`}>
+      {initial}
+    </div>
+  );
+}
+
 export function LandingTestimonials() {
   const [items, setItems] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,9 +117,7 @@ export function LandingTestimonials() {
                 <p>{item.message}</p>
 
                 <div className="testimonial-person">
-                  <div className="testimonial-avatar">
-                    {item.displayName.slice(0, 1).toUpperCase()}
-                  </div>
+                  <TestimonialAvatar item={item} />
                   <div>
                     <strong>{item.displayName}</strong>
                     <span>{item.storeName}</span>
@@ -100,9 +127,9 @@ export function LandingTestimonials() {
             ))}
           </div>
 
-          <div className="testimonial-disclaimer">
+          {/* <div className="testimonial-disclaimer">
             แสดงเฉพาะ Feedback ที่ผู้ใช้อนุญาตให้เผยแพร่และผ่านการตรวจสอบจากทีมเหลือจริงแล้ว
-          </div>
+          </div> */}
         </>
       ) : (
         <div className="testimonial-empty-state testimonial-feedback-cta">

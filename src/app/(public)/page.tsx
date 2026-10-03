@@ -1,5 +1,6 @@
 import { LandingTestimonials } from "@/components/landing-testimonials";
 import { BrandMark } from "@/components/brand-logo";
+import { HeroStoreAvatar } from "@/components/hero-store-avatar";
 import Link from "next/link";
 
 const features = [
@@ -80,9 +81,9 @@ export default function LandingPage() {
           <div className="hero-product hero-product-v2">
             <div className="hero-product-top hero-store-head">
               <div className="hero-store-identity">
-                <span className="hero-store-avatar">ป้าส่งยิ้ม</span>
+                <HeroStoreAvatar />
                 <div>
-                  <strong>ร้านตัวอย่าง&nbsp;</strong>
+                  <strong>ร้านตัวอย่าง</strong>
                   <small>Shopee + TikTok Shop • 30 วันล่าสุด</small>
                 </div>
               </div>

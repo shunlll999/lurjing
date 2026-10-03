@@ -8,6 +8,8 @@ export interface FeedbackItem {
   userId: string;
   displayName: string;
   storeName: string;
+  /** Snapshot of the shop avatar for public testimonials. */
+  storeAvatarUrl?: string;
   rating: number;
   message: string;
   allowPublic: boolean;

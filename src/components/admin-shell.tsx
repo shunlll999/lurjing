@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import { BrandMark } from "@/components/brand-logo";
+import { StoreAvatar } from "./store-avatar";
 
 const items = [
   { href: "/admin", label: "Overview" },
@@ -39,7 +40,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={pathname === item.href ? "admin-nav active" : "admin-nav"}
+              className={
+                pathname === item.href ? "admin-nav active" : "admin-nav"
+              }
             >
               {item.label}
             </Link>
@@ -48,7 +51,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
         <div className="admin-sidebar-footer">
           <div className="admin-account">
-            <span>{(user?.displayName || "A").slice(0, 1)}</span>
+            <StoreAvatar
+              className="account-avatar"
+              src={user?.storeAvatarUrl}
+              name={user?.storeName || user?.displayName || "ร้าน"}
+            />
+            {/* <span>{(user?.displayName || "A").slice(0, 1)}</span> */}
             <div>
               <strong>{user?.displayName}</strong>
               <small>{user?.email}</small>
