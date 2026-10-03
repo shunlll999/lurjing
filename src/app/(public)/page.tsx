@@ -80,9 +80,9 @@ export default function LandingPage() {
           <div className="hero-product hero-product-v2">
             <div className="hero-product-top hero-store-head">
               <div className="hero-store-identity">
-                <span className="hero-store-avatar">ร</span>
+                <span className="hero-store-avatar">ป้าส่งยิ้ม</span>
                 <div>
-                  <strong>ร้านตัวอย่าง</strong>
+                  <strong>ร้านตัวอย่าง&nbsp;</strong>
                   <small>Shopee + TikTok Shop • 30 วันล่าสุด</small>
                 </div>
               </div>
